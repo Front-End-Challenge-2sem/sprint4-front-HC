@@ -1126,4 +1126,123 @@ const Tabelas: React.FC = () => {
     }
   };
 
+  const tabs = [
+    { id: "usuario" as EntityType, label: "Usuários" },
+    { id: "medico" as EntityType, label: "Médicos" },
+    { id: "cadastro" as EntityType, label: "Cadastros" },
+  ];
+
+  // Componentes de tabela (mantidos iguais)
+  const UsuarioTable = () => (
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white">
+        <thead className="bg-blue-500 text-white">
+          <tr>
+            <th className="py-3 px-4 text-left">ID</th>
+            <th className="py-3 px-4 text-left">Nome</th>
+            <th className="py-3 px-4 text-left">Idade</th>
+            <th className="py-3 px-4 text-left">Data Nasc.</th>
+            <th className="py-3 px-4 text-left">Telefone</th>
+            <th className="py-3 px-4 text-left">CPF Cadastro</th>
+            <th className="py-3 px-4 text-left">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {usuarios.map((usuario, index) => (
+            <tr
+              key={usuario.id_usuario}
+              className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+            >
+              <td className="py-3 px-4 border-b">{usuario.id_usuario}</td>
+              <td className="py-3 px-4 border-b">{usuario.nome}</td>
+              <td className="py-3 px-4 border-b">{usuario.idade}</td>
+              <td className="py-3 px-4 border-b">
+                {new Date(usuario.data_nascimento).toLocaleDateString("pt-BR")}
+              </td>
+              <td className="py-3 px-4 border-b">{usuario.telefone}</td>
+              <td className="py-3 px-4 border-b">
+                {usuario.cadastro_cpf_cadastro}
+              </td>
+              <td className="py-3 px-4 border-b">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(usuario)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm transition-colors"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleDelete(usuario.id_usuario)}
+                    className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-sm transition-colors"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+          {usuarios.length === 0 && (
+            <tr>
+              <td colSpan={7} className="py-4 px-4 text-center text-gray-500">
+                Nenhum usuário encontrado
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const MedicoTable = () => (
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white">
+        <thead className="bg-green-500 text-white">
+          <tr>
+            <th className="py-3 px-4 text-left">ID</th>
+            <th className="py-3 px-4 text-left">Nome</th>
+            <th className="py-3 px-4 text-left">CPF</th>
+            <th className="py-3 px-4 text-left">Tipo</th>
+            <th className="py-3 px-4 text-left">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {medicos.map((medico, index) => (
+            <tr
+              key={medico.id_medico}
+              className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+            >
+              <td className="py-3 px-4 border-b">{medico.id_medico}</td>
+              <td className="py-3 px-4 border-b">{medico.nome}</td>
+              <td className="py-3 px-4 border-b">{medico.cpf}</td>
+              <td className="py-3 px-4 border-b">{medico.tipo_medico}</td>
+              <td className="py-3 px-4 border-b">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(medico)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm transition-colors"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleDelete(medico.id_medico)}
+                    className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-sm transition-colors"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+          {medicos.length === 0 && (
+            <tr>
+              <td colSpan={5} className="py-4 px-4 text-center text-gray-500">
+                Nenhum médico encontrado
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
 export default Tabelas;
