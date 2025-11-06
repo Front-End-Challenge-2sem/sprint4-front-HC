@@ -194,4 +194,70 @@ const validationRules = {
   }),
 };
 
+const formatadores = {
+  apenasNumeros: (valor: string) => valor.replace(/\D/g, ""),
+  apenasLetras: (valor: string) => valor.replace(/[^A-Za-zÀ-ÿ\s.]/g, ""),
+};
+
+// Componente de Loading com Temporizador
+interface LoadingWithTimerProps {
+  message?: string;
+}
+
+const LoadingWithTimer: React.FC<LoadingWithTimerProps> = ({
+  message = "Carregando...",
+}) => {
+  const [timeLeft, setTimeLeft] = useState<number>(120);
+
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => prevTime - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
+  const progressPercentage = ((120 - timeLeft) / 120) * 100;
+
+  return (
+    <div className="text-center py-8">
+      <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mb-4"></div>
+      <p className="text-lg font-semibold text-gray-700 mb-2">{message}</p>
+      <div className="mb-4">
+        <div className="text-2xl font-bold text-blue-600 mb-2">
+          {formatTime(timeLeft)}
+        </div>
+        <p className="text-sm text-gray-500">Tempo estimado: 2 minutos</p>
+      </div>
+      <div className="w-full max-w-xs mx-auto bg-gray-200 rounded-full h-2 mb-4">
+        <div
+          className="bg-blue-500 h-2 rounded-full transition-all duration-1000 ease-out"
+          style={{ width: `${progressPercentage}%` }}
+        ></div>
+      </div>
+      <div className="text-sm text-gray-600">
+        {timeLeft > 100 && "Iniciando conexão com o servidor..."}
+        {timeLeft <= 100 && timeLeft > 60 && "Processando dados..."}
+        {timeLeft <= 60 && timeLeft > 30 && "Finalizando carregamento..."}
+        {timeLeft <= 30 && "Quase pronto..."}
+      </div>
+      <div className="mt-4 p-3 bg-blue-50 rounded-lg max-w-md mx-auto">
+        <p className="text-xs text-blue-700">
+          Esta operação pode levar até 2 minutos.
+        </p>
+      </div>
+    </div>
+  );
+};
+
 export default Tabelas;
