@@ -751,4 +751,95 @@ const ModalForm: React.FC<ModalFormProps> = ({
     </div>
   );
 
+  const renderCadastroForm = () => (
+    <div className="grid grid-cols-1 gap-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          CPF *
+        </label>
+        <input
+          type="text"
+          placeholder="Ex: 12312312312"
+          {...register("cpf_cadastro", {
+            ...validationRules.cpf,
+            disabled: !!item,
+          })}
+          onChange={(e) =>
+            handleInputChange("cpf_cadastro", e.target.value, "numeros")
+          }
+          className={`w-full p-2 border rounded-lg ${
+            errors.cpf_cadastro ? "border-red-500" : "border-gray-300"
+          } ${item ? "bg-gray-100 cursor-not-allowed" : ""}`}
+          maxLength={11}
+        />
+        {errors.cpf_cadastro && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.cpf_cadastro.message}
+          </p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Email *
+        </label>
+        <input
+          type="email"
+          {...register("email", validationRules.email)}
+          className={`w-full p-2 border rounded-lg ${
+            errors.email ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.email && (
+          <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Status
+        </label>
+        {item ? (
+          // Exibe o status atual como texto (somente leitura)
+          <div className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50">
+            <span
+              className={`px-2 py-1 rounded-full text-xs ${
+                (item as Cadastro).status === "Ativo"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+              }`}
+            >
+              {(item as Cadastro).status}
+            </span>
+            <p className="text-xs text-gray-500 mt-1">
+              O status não pode ser alterado
+            </p>
+          </div>
+        ) : (
+          // Para novos cadastros, ainda permite selecionar o status
+          <select
+            {...register("status")}
+            className="w-full p-2 border border-gray-300 rounded-lg"
+          >
+            <option value="ativo">Ativo</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Senha *
+        </label>
+        <input
+          type="text"
+          {...register("senha", validationRules.required("Senha"))}
+          className={`w-full p-2 border rounded-lg ${
+            errors.senha ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.senha && (
+          <p className="text-red-500 text-xs mt-1">{errors.senha.message}</p>
+        )}
+      </div>
+    </div>
+  );
+
 export default Tabelas;
