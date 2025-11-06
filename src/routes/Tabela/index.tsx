@@ -1305,4 +1305,137 @@ const Tabelas: React.FC = () => {
     </div>
   );
 
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold text-blue-600 mb-8 text-center">
+        Gerenciamento do Sistema
+      </h1>
+
+      {/* Tabs */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
+              activeTab === tab.id
+                ? "bg-blue-500 text-white shadow-lg"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Botões de Ação */}
+      <div className="mb-6 flex flex-wrap gap-3">
+        {/* Botão Adicionar */}
+        <button
+          onClick={handleCreate}
+          className={`py-3 px-6 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2 ${
+            activeTab === "cadastro"
+              ? "bg-gray-400 text-white cursor-not-allowed"
+              : "bg-green-500 hover:bg-green-600 text-white"
+          }`}
+          disabled={activeTab === "cadastro"}
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          {activeTab === "cadastro"
+            ? "Criação Desabilitada"
+            : `Adicionar ${tabs.find((t) => t.id === activeTab)?.label}`}
+        </button>
+
+        {/* Botão Atualizar */}
+        <button
+          onClick={handleRefresh}
+          disabled={loading}
+          className="py-3 px-6 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white disabled:bg-blue-300 disabled:cursor-not-allowed"
+        >
+          <svg
+            className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+          Atualizar Dados
+        </button>
+      </div>
+
+      {/* Mensagem de Erro */}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+          {error}
+        </div>
+      )}
+
+      {/* Loading com Temporizador */}
+      {loading && <LoadingWithTimer />}
+
+      {/* Tabelas */}
+      {!loading && (
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          {activeTab === "usuario" && <UsuarioTable />}
+          {activeTab === "medico" && <MedicoTable />}
+          {activeTab === "cadastro" && <CadastroTable />}
+        </div>
+      )}
+
+      {/* Modal de Formulário */}
+      {showModal && (
+        <ModalForm
+          type={activeTab}
+          item={editingItem}
+          onSave={handleSave}
+          onClose={() => {
+            setShowModal(false);
+            setEditingItem(null);
+          }}
+        />
+      )}
+
+      {/* Modal de Confirmação para Exclusão */}
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita."
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          setShowConfirmModal(false);
+          setItemToDelete(null);
+        }}
+        type="warning"
+      />
+
+      {/* Modal de Mensagem */}
+      <MessageModal
+        isOpen={showMessageModal}
+        title={modalMessage.title}
+        message={modalMessage.message}
+        type={modalMessage.type}
+        onClose={() => setShowMessageModal(false)}
+      />
+    </div>
+  );
+};
+
 export default Tabelas;
