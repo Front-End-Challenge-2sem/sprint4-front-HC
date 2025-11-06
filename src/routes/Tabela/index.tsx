@@ -842,4 +842,39 @@ const ModalForm: React.FC<ModalFormProps> = ({
     </div>
   );
 
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            {getTitle()}
+          </h2>
+
+          <form onSubmit={handleSubmit(onSubmit)}>
+            {type === "usuario" && renderUsuarioForm()}
+            {type === "medico" && renderMedicoForm()}
+            {type === "cadastro" && renderCadastroForm()}
+
+            <div className="flex gap-3 mt-6">
+              <button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-lg font-semibold transition-colors"
+              >
+                Salvar
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg font-semibold transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default Tabelas;
