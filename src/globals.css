@@ -1,0 +1,719 @@
+@import "tailwindcss";
+:root {
+  scroll-behavior: smooth;
+}
+
+@layer base {
+  * {
+    @apply m-0 p-0 box-border;
+  }
+  
+  body {
+    @apply font-sans leading-relaxed text-gray-800 bg-gray-50;
+  }
+  
+  a {
+    @apply no-underline text-blue-500 transition-all duration-300 ease-in-out;
+  }
+  
+  img {
+    @apply max-w-full h-auto;
+  }
+}
+
+@layer components {
+  .container {
+    @apply w-[90%] max-w-6xl mx-auto px-4;
+  }
+  
+  .cabecalho {
+    @apply bg-white shadow-md sticky top-0 z-50 py-4;
+  }
+  
+  .cabecalho .container {
+    @apply flex flex-col md:flex-row justify-between items-center relative;
+  }
+  
+  .logo img {
+    @apply h-12;
+  }
+  
+  .menu-toggle {
+    @apply block md:hidden bg-transparent border-none text-2xl cursor-pointer text-blue-600 absolute top-5 right-4;
+  }
+  .menu-principal ul {
+  @apply hidden md:flex list-none;
+}
+
+.menu-principal.ativo ul {
+  @apply flex flex-col md:flex-row list-none absolute md:static top-full left-0 right-0 bg-white md:bg-transparent shadow-md md:shadow-none py-4 md:py-0;
+}
+
+.menu-principal li {
+  @apply ml-5;
+}
+
+.menu-principal a {
+  @apply text-blue-600 font-medium py-1 relative;
+}
+
+.menu-principal a::after {
+  content: '';
+  @apply absolute bottom-0 left-0 w-0 h-0.5 bg-blue-500 transition-all duration-300 ease-in-out;
+}
+
+.menu-principal a:hover::after {
+  @apply w-full;
+}
+
+.hero-section {
+    @apply bg-gradient-to-b from-blue-500 to-blue-300 text-white py-24 md:py-32 lg:py-40 text-center;
+  }
+  
+  .hero-container {
+    @apply w-[90%] max-w-6xl mx-auto px-4;
+  }
+  
+  .hero-title {
+    @apply text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-5;
+  }
+
+  .hero-subtitle {
+    @apply text-base md:text-xl mb-8 max-w-3xl mx-auto;
+  }
+  
+  .hero-button {
+    @apply inline-block bg-blue-500 text-white py-3 px-8 rounded-lg font-semibold border-none cursor-pointer transition-all duration-300 ease-in-out;
+  }
+  
+  .hero-button:hover {
+    @apply bg-blue-700 -translate-y-1 shadow-lg text-white;
+  }
+  
+  .benefits-section {
+    @apply py-20;
+  }
+  
+  .benefits-container {
+    @apply w-[90%] max-w-6xl mx-auto px-4;
+  }
+  
+  .benefits-title {
+    @apply text-center mb-12 text-3xl text-blue-600;
+  }
+  
+  .benefits-grid {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8;
+  }
+  
+  .benefit-card {
+    @apply bg-white p-8 rounded-lg shadow-md text-center transition-all duration-300 ease-in-out;
+  }
+  
+  .benefit-card:hover {
+    @apply -translate-y-3 shadow-xl;
+  }
+  
+  .benefit-icon {
+    @apply w-1/2 mx-auto mb-5;
+  }
+  
+  .benefit-title {
+    @apply mb-4 text-blue-600 text-xl font-semibold;
+  }
+  
+  .statistics-section {
+    @apply bg-blue-400 text-white py-20 text-center;
+  }
+  
+  .statistics-container {
+    @apply w-[90%] max-w-6xl mx-auto px-4;
+  }
+  
+  .statistics-title {
+    @apply mb-12 text-3xl;
+  }
+  
+  .statistics-grid {
+    @apply flex flex-col md:flex-row justify-center flex-wrap gap-12;
+  }
+  
+  .statistic-item {
+    @apply flex-1 min-w-[150px];
+  }
+  
+  .statistic-value {
+    @apply text-5xl font-bold block mb-3;
+  }
+
+  .voltar {
+    @apply mb-8;
+  }
+  
+.botao-voltar {
+  @apply text-white bg-blue-500 py-2 px-4 rounded-lg font-bold flex items-center gap-2 transition-all duration-300 ease-in-out;
+}
+
+.botao-voltar:hover {
+  @apply bg-white text-blue-500 border border-blue-500 -translate-x-1 shadow-md;
+}
+
+  
+  .botao {
+    @apply bg-blue-500 text-white py-3 px-6 border-none rounded-lg cursor-pointer text-base transition-colors duration-300 ease-in-out transition-transform duration-300 ease-in-out;
+  }
+  
+  .botao:hover {
+    @apply bg-blue-700 scale-105;
+  }
+  
+  .botao-secundario {
+    @apply bg-transparent border-2 border-blue-500 ml-4 text-white transition-all duration-300 ease-in-out;
+  }
+  
+  .botao-secundario:hover {
+    @apply bg-blue-500 text-white scale-105;
+  }
+
+  .passo-imagem img {
+    @apply w-full max-h-80 object-contain rounded-lg shadow-md transition-transform duration-500 ease-in-out;
+  }
+  
+  .passo-imagem img:hover {
+    @apply scale-105;
+  }
+  
+  .icone-voltar {
+    @apply w-5 h-5 mr-2;
+  }
+  
+  .redes-sociais {
+    @apply flex justify-center gap-4 mt-4;
+  }
+  
+  .redes-sociais a {
+    @apply w-10 h-10 flex items-center justify-center bg-gray-50 rounded-full transition-all duration-300 ease-in-out;
+  }
+  
+  .redes-sociais a:hover {
+    @apply bg-gray-200;
+  }
+  
+  .sobre-projeto {
+    @apply mt-16 bg-white p-10 rounded-lg shadow-md;
+  }
+  
+  .sobre-projeto h2 {
+    @apply text-center mb-8 text-blue-600;
+  }
+  
+  .sobre-grid {
+    @apply grid grid-cols-1 gap-8;
+  }
+  
+  .sobre-grid h3 {
+    @apply text-blue-500 mb-3;
+  }
+  
+  .sobre-grid ul {
+    @apply list-none pl-0;
+  }
+  
+  .sobre-grid li::before {
+    content: "•";
+    @apply text-blue-600 font-bold inline-block w-4 -ml-4;
+  }
+
+  .pagina-login {
+    @apply flex flex-col items-center p-8 bg-gray-50 min-h-screen;
+  }
+  
+  .login-container {
+    @apply text-center mb-8;
+  }
+  
+  .logo-login {
+  @apply flex justify-center items-center mb-4;
+}
+
+.logo-login img {
+  @apply max-w-[180px];
+}
+
+  
+  .titulo-login {
+    @apply text-xl font-bold mb-2 text-gray-800;
+  }
+  
+  .subtitulo-login {
+    @apply text-sm text-gray-600;
+  }
+  
+  .subtitulo-login a {
+    @apply text-blue-500 font-bold no-underline;
+  }
+  
+  .subtitulo-login a:hover {
+    @apply underline;
+  }
+  
+  .login-form-container {
+    @apply flex justify-center w-full;
+  }
+  
+  .login-card {
+    @apply bg-white rounded-xl p-8 shadow-md w-full max-w-md;
+  }
+  
+  .form-login {
+    @apply flex flex-col gap-4;
+  }
+  
+  .campo-form {
+    @apply flex flex-col;
+  }
+  
+  .campo-form label {
+    @apply text-sm mb-1 text-gray-800;
+  }
+  
+  .campo-form input {
+    @apply py-2 px-3 border border-gray-300 rounded-lg text-base outline-none transition-colors duration-200 ease-in-out;
+  }
+  
+  .campo-form input:focus {
+    @apply border-blue-500;
+  }
+  
+  .mensagem-erro {
+    @apply text-red-500 text-xs mt-1;
+  }
+  
+  .opcoes-login {
+    @apply flex justify-between items-center text-xs mb-2;
+  }
+  
+  .lembrar-me {
+    @apply flex items-center gap-1;
+  }
+  
+  .esqueceu-senha a {
+    @apply text-blue-500 no-underline;
+  }
+  
+  .esqueceu-senha a:hover {
+    @apply underline;
+  }
+  
+  .botao-cadastre-se {
+    @apply inline-block bg-blue-500 text-white font-bold rounded-lg py-3 px-4 no-underline transition-all duration-300 ease-in-out;
+  }
+  
+  .botao-cadastre-se:hover {
+    @apply bg-white text-blue-500 border border-blue-500;
+  }
+
+  .cadastro-container {
+    @apply flex flex-col items-center justify-center p-8 bg-gray-50;
+  }
+  
+  .acessibilidade-info {
+    @apply mt-6 pt-4 border-t border-gray-200 text-center text-sm;
+  }
+  
+  .acessibilidade-info h3 {
+    @apply text-base mb-2 text-gray-800;
+  }
+  
+  .acessibilidade-info strong {
+    @apply text-gray-900;
+  }
+  
+  .dicas-seguranca {
+    @apply mt-8 bg-blue-50 p-6 rounded-xl max-w-md w-full;
+  }
+  
+  .dicas-seguranca h3 {
+    @apply text-base mb-3 text-gray-800;
+  }
+  
+  .dicas-seguranca ul {
+    @apply pl-5 list-disc;
+  }
+  
+  .dicas-seguranca li {
+    @apply text-sm mb-1 text-gray-700;
+  }
+  
+  .beneficios {
+    @apply py-20;
+  }
+  
+  .beneficios h2 {
+    @apply text-center mb-12 text-3xl text-blue-600;
+  }
+  
+  .grid-beneficios {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8;
+  }
+  
+  .beneficio {
+    @apply bg-white p-8 rounded-lg shadow-md text-center transition-all duration-300 ease-in-out;
+  }
+  
+  .beneficio:hover {
+    @apply -translate-y-3 shadow-xl;
+  }
+  
+  .beneficio img {
+    @apply mb-5;
+  }
+  
+  .beneficio h3 {
+    @apply mb-4 text-blue-600;
+  }
+  
+  .estatisticas {
+    @apply bg-blue-600 text-white py-20 text-center;
+  }
+  
+  .estatisticas h2 {
+    @apply mb-12 text-3xl;
+  }
+  
+  .dados {
+    @apply flex flex-col md:flex-row justify-center flex-wrap gap-12;
+  }
+  
+  .dado {
+    @apply flex-1 min-w-[150px];
+  }
+  
+  .numero {
+    @apply text-5xl font-bold block mb-3;
+  }
+  
+  .rodape {
+    @apply bg-blue-500 text-white p-12;
+  }
+  
+  .rodape-container {
+    @apply max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8;
+  }
+  
+  .rodape-secao h3 {
+    @apply text-xl font-bold mb-4;
+  }
+  
+  .rodape-links {
+    @apply list-none p-0 m-0;
+  }
+  
+  .rodape-links li + li {
+    @apply mt-2;
+  }
+  
+  .rodape-links a {
+    @apply text-white no-underline transition-all duration-300 ease-in-out;
+  }
+  
+  .rodape-links a:hover {
+    @apply underline;
+  }
+  
+  address {
+    @apply not-italic;
+  }
+  
+  .rodape-bottom {
+    @apply border-t border-blue-800 mt-8 pt-6 text-center text-sm;
+  }
+
+  .passo {
+    @apply flex flex-col md:flex-row gap-8 opacity-0 translate-y-5 transition-all duration-700 ease-in-out mb-16;
+  }
+  
+  .passo-reverso {
+    @apply flex flex-col md:flex-row-reverse;
+  }
+  
+  .passo.animado {
+    @apply opacity-100 translate-y-0;
+  }
+  
+  .passo-conteudo {
+    @apply relative;
+  }
+  
+  .passo-numero {
+    @apply text-6xl font-bold text-blue-200 absolute -top-5 -left-3 -z-10;
+  }
+  
+  .passo-conteudo h3 {
+    @apply text-blue-600 text-xl mb-4;
+  }
+  
+  .passo-conteudo p {
+    @apply text-lg text-gray-600 leading-relaxed;
+  }
+  
+  .cta-guia {
+    @apply bg-blue-400 text-white py-20 px-5 text-center;
+  }
+  
+  .cta-guia h2 {
+    @apply text-3xl mb-5;
+  }
+  
+  .cta-guia p {
+    @apply text-xl mb-8;
+  }
+  
+  .botoes-cta {
+    @apply flex flex-col md:flex-row gap-5 justify-center mb-5;
+  }
+  
+  .botoes-cta .botao {
+    @apply bg-blue-700 w-full md:w-1/5 text-base;
+  }
+  
+  .botoes-cta .botao:hover {
+    @apply bg-blue-800 -translate-y-1 shadow-lg;
+  }
+  
+  .botoes-cta .botao.botao-secundario {
+    @apply border-blue-700 text-white bg-blue-600 py-3 px-5;
+  }
+  
+  .botoes-cta .botao.botao-secundario:hover {
+    @apply bg-blue-900 -translate-y-1;
+  }
+  
+  .dica-interativa {
+    @apply bg-blue-50 border-l-4 border-blue-500 p-5 rounded-lg my-10 max-w-3xl mx-auto;
+  }
+  
+  .dica-conteudo {
+    @apply flex items-start gap-4;
+  }
+  
+  .icone-dica {
+    @apply w-6 h-6 text-blue-500 flex-shrink-0;
+  }
+  
+  .dica-interativa p {
+    @apply text-blue-900;
+  }
+  
+  .destaque-guia {
+    @apply bg-gradient-to-b from-blue-500 to-blue-300 bg-cover bg-center text-white py-24 text-center;
+  }
+  
+  .destaque-guia h1 {
+    @apply text-4xl mb-5;
+  }
+  
+  .destaque-guia .subtitulo {
+    @apply text-xl max-w-3xl mx-auto text-white;
+  }
+  
+  .passos {
+    @apply py-20;
+  }
+  
+  .titulo-secao {
+    @apply text-center mb-12 text-blue-600 text-3xl;
+  }
+  
+  .video-tutorial {
+    @apply py-20 bg-gray-50 text-center;
+  }
+  
+  .video-tutorial h2 {
+    @apply mb-5 text-blue-600;
+  }
+  
+  .video-tutorial p {
+    @apply mb-8 max-w-3xl mx-auto;
+  }
+  
+  .video-container {
+    @apply relative pb-[56.25%] h-0 overflow-hidden max-w-3xl mx-auto bg-black rounded-lg;
+  }
+  
+  .video-container iframe {
+    @apply absolute top-0 left-0 w-full h-full;
+  }
+  
+  .faq {
+    @apply py-20;
+  }
+  
+.faq h1 {
+  @apply text-center mb-12 text-blue-700 text-4xl font-bold pb-3 border-b-2 border-blue-200;
+}
+  
+  .perguntas {
+    @apply max-w-3xl mx-auto;
+  }
+  
+  .pergunta {
+    @apply mb-4 rounded-lg overflow-hidden shadow-md;
+  }
+  
+  .pergunta-titulo {
+    @apply w-full p-5 bg-white border-none text-left text-lg font-semibold text-blue-600 cursor-pointer flex justify-between items-center transition-all duration-300 ease-in-out;
+  }
+  
+  .pergunta-titulo:hover {
+    @apply bg-gray-50;
+  }
+  
+  .icone {
+    @apply text-xl;
+  }
+  
+  .pergunta-resposta {
+    @apply px-5 max-h-0 overflow-hidden transition-all duration-300 ease-in-out bg-white;
+  }
+  
+  .pergunta-resposta p {
+    @apply py-5;
+  }
+  
+  .pergunta.ativa .pergunta-resposta {
+    @apply max-h-96;
+  }
+  
+  .pergunta.ativa .icone {
+    @apply rotate-45;
+  }
+  
+  .contato {
+    @apply py-20;
+  }
+  
+  .contato h1 {
+    @apply text-center mb-3 text-blue-600;
+  }
+  
+  .contato .subtitulo {
+    @apply text-center mb-12;
+  }
+  
+  .contato-conteudo {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-12;
+  }
+  
+  .contato-info h2 {
+    @apply mb-5 text-blue-600;
+  }
+  
+  .contato-info address {
+    @apply not-italic mb-8;
+  }
+  
+  .contato-info p {
+    @apply mb-3;
+  }
+
+  .form-contato {
+    @apply bg-white p-8 rounded-lg shadow-md;
+  }
+  
+  .form-grupo {
+    @apply mb-5;
+  }
+  
+  .form-grupo label {
+    @apply block mb-2 font-medium text-blue-600;
+  }
+  
+  .form-grupo input,
+  .form-grupo select,
+  .form-grupo textarea {
+    @apply w-full p-3 border border-gray-300 rounded-lg font-sans transition-all duration-300 ease-in-out;
+  }
+  
+  .form-grupo input:focus,
+  .form-grupo select:focus,
+  .form-grupo textarea:focus {
+    @apply outline-none border-blue-500 ring-2 ring-blue-200;
+  }
+  
+  .form-grupo textarea {
+    @apply resize-y min-h-[120px];
+  }
+  
+  .equipe {
+    @apply py-20;
+  }
+  
+  .equipe h1 {
+    @apply text-center mb-3 text-blue-600 text-4xl; 
+  }
+
+  .subtitulo {
+    @apply text-center mb-12 text-2xl text-gray-600; 
+  }
+
+  .membros {
+    @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center items-center;
+  }
+
+  .membro {
+    @apply bg-white p-6 rounded-lg shadow-md text-center transition-all duration-300 ease-in-out w-full max-w-xs; 
+  }
+
+  .membro:hover {
+    @apply -translate-y-2 shadow-lg;
+  }
+
+  .foto-membro {
+    @apply w-36 h-36 rounded-full object-cover mx-auto mb-5 border-4 border-gray-100;
+  }
+
+  .membro h2 {
+    @apply mb-2 text-blue-600 text-xl;
+  }
+
+  .detalhes {
+    @apply text-gray-600 mb-4 text-base;
+  }
+
+    .guia-voltar {
+    @apply text-white bg-blue-500 py-2 px-4 rounded-lg font-bold flex items-center gap-2 transition-all duration-300 ease-in-out;
+  }
+  
+  .guia-voltar:hover {
+    @apply text-gray-100 bg-blue-600;
+  }
+  
+  .faq-voltar {
+    @apply text-white bg-blue-500 py-2 px-4 rounded-lg font-bold flex items-center gap-2 transition-all duration-300 ease-in-out ml-0 md:ml-40;
+  }
+  
+  .faq-voltar:hover {
+    @apply bg-white text-blue-500 border border-blue-500;
+  }
+  
+  .contato-voltar {
+    @apply my-2 ml-0 md:ml-2 text-white bg-blue-500 py-2 px-4 rounded-lg font-bold flex items-center gap-2 transition-all duration-300 ease-in-out;
+  }
+  
+  .contato-voltar:hover {
+    @apply bg-white border border-blue-500;
+  }
+  
+  .integrantes-voltar {
+    @apply text-white bg-blue-500 py-2 px-4 rounded-lg font-bold flex items-center gap-2 transition-all duration-300 ease-in-out;
+  }
+  
+  .integrantes-voltar:hover {
+    @apply bg-white border border-blue-500;
+  }
+  
+  .erro {
+    @apply text-red-500 text-sm mt-1;
+  }
+}
