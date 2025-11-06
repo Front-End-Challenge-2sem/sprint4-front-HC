@@ -442,4 +442,254 @@ const MessageModal: React.FC<MessageModalProps> = ({
   );
 };
 
+// Componente Modal de Formulário
+interface ModalFormProps {
+  type: EntityType;
+  item: Usuario | Medico | Cadastro | null;
+  onSave: (data: FormData) => void;
+  onClose: () => void;
+}
+
+const ModalForm: React.FC<ModalFormProps> = ({
+  type,
+  item,
+  onSave,
+  onClose,
+}) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    reset,
+  } = useForm<FormData>({
+    mode: "onChange",
+  });
+
+  useEffect(() => {
+    if (item) {
+      Object.entries(item).forEach(([key, value]) => {
+        setValue(key as keyof FormData, value as never);
+      });
+    } else {
+      reset();
+      switch (type) {
+        case "usuario":
+          setValue("nome", "");
+          setValue("idade", 0);
+          setValue("data_nascimento", "");
+          setValue("telefone", "");
+          setValue("chatbot_id_conversa", 0);
+          setValue("cadastro_cpf_cadastro", "");
+          setValue("agenda_id_agenda", 0);
+          setValue("medico_id_medico", 0);
+          break;
+        case "medico":
+          setValue("nome", "");
+          setValue("cpf", "");
+          setValue("tipo_medico", "");
+          break;
+        case "cadastro":
+          setValue("cpf_cadastro", "");
+          setValue("email", "");
+          setValue("status", "ativo");
+          setValue("senha", "");
+          break;
+      }
+    }
+  }, [item, type, setValue, reset]);
+
+  const handleInputChange = (
+    field: keyof FormData,
+    value: string,
+    tipo: "numeros" | "letras" = "numeros"
+  ) => {
+    let valorFormatado = value;
+
+    if (tipo === "numeros") {
+      valorFormatado = formatadores.apenasNumeros(value);
+    } else if (tipo === "letras") {
+      valorFormatado = formatadores.apenasLetras(value);
+    }
+
+    setValue(field, valorFormatado as never);
+  };
+
+  const onSubmit = (data: FormData) => {
+    onSave(data);
+  };
+
+  const getTitle = () => {
+    const action = item ? "Editar" : "Adicionar";
+    const entity =
+      type === "usuario"
+        ? "Usuário"
+        : type === "medico"
+        ? "Médico"
+        : "Cadastro";
+    return `${action} ${entity}`;
+  };
+
+  const renderUsuarioForm = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Nome *
+        </label>
+        <input
+          type="text"
+          {...register("nome", validationRules.nome)}
+          onChange={(e) => handleInputChange("nome", e.target.value, "letras")}
+          className={`w-full p-2 border rounded-lg ${
+            errors.nome ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.nome && (
+          <p className="text-red-500 text-xs mt-1">{errors.nome.message}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Idade *
+        </label>
+        <input
+          type="number"
+          {...register("idade", validationRules.required("Idade"))}
+          className={`w-full p-2 border rounded-lg ${
+            errors.idade ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.idade && (
+          <p className="text-red-500 text-xs mt-1">{errors.idade.message}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Data Nascimento *
+        </label>
+        <input
+          type="date"
+          {...register(
+            "data_nascimento",
+            validationRules.required("Data de nascimento")
+          )}
+          className={`w-full p-2 border rounded-lg ${
+            errors.data_nascimento ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.data_nascimento && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.data_nascimento.message}
+          </p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Telefone *
+        </label>
+        <input
+          type="text"
+          placeholder="Ex: 11912345678"
+          {...register("telefone", validationRules.telefone)}
+          onChange={(e) =>
+            handleInputChange("telefone", e.target.value, "numeros")
+          }
+          className={`w-full p-2 border rounded-lg ${
+            errors.telefone ? "border-red-500" : "border-gray-300"
+          }`}
+          maxLength={11}
+        />
+        {errors.telefone && (
+          <p className="text-red-500 text-xs mt-1">{errors.telefone.message}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Chatbot ID *
+        </label>
+        <input
+          type="number"
+          {...register(
+            "chatbot_id_conversa",
+            validationRules.required("Chatbot ID")
+          )}
+          className={`w-full p-2 border rounded-lg ${
+            errors.chatbot_id_conversa ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.chatbot_id_conversa && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.chatbot_id_conversa.message}
+          </p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          CPF Cadastro *
+        </label>
+        <input
+          type="text"
+          placeholder="Ex: 12312312312"
+          {...register("cadastro_cpf_cadastro", validationRules.cpf)}
+          onChange={(e) =>
+            handleInputChange(
+              "cadastro_cpf_cadastro",
+              e.target.value,
+              "numeros"
+            )
+          }
+          className={`w-full p-2 border rounded-lg ${
+            errors.cadastro_cpf_cadastro ? "border-red-500" : "border-gray-300"
+          }`}
+          maxLength={11}
+        />
+        {errors.cadastro_cpf_cadastro && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.cadastro_cpf_cadastro.message}
+          </p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Agenda ID *
+        </label>
+        <input
+          type="number"
+          {...register(
+            "agenda_id_agenda",
+            validationRules.required("Agenda ID")
+          )}
+          className={`w-full p-2 border rounded-lg ${
+            errors.agenda_id_agenda ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.agenda_id_agenda && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.agenda_id_agenda.message}
+          </p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Médico ID *
+        </label>
+        <input
+          type="number"
+          {...register(
+            "medico_id_medico",
+            validationRules.required("Médico ID")
+          )}
+          className={`w-full p-2 border rounded-lg ${
+            errors.medico_id_medico ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.medico_id_medico && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.medico_id_medico.message}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+
 export default Tabelas;
