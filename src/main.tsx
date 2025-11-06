@@ -20,7 +20,8 @@ const router = createBrowserRouter([
     {path:"/integrantes", element:<Integrantes/>},
     {path:"/guia", element:<Guia/>},
     {path:"/login", element:<Login/>},
-    {path:"/cadastro", element:<Cadastro/>}
+    {path:"/cadastro", element:<Cadastro/>},
+    {path:"/tabela", element}
   ]}
 ])
 
