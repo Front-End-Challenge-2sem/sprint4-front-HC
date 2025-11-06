@@ -692,4 +692,63 @@ const ModalForm: React.FC<ModalFormProps> = ({
     </div>
   );
 
+    const renderMedicoForm = () => (
+    <div className="grid grid-cols-1 gap-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Nome *
+        </label>
+        <input
+          type="text"
+          {...register("nome", validationRules.nome)}
+          onChange={(e) => handleInputChange("nome", e.target.value, "letras")}
+          className={`w-full p-2 border rounded-lg ${
+            errors.nome ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.nome && (
+          <p className="text-red-500 text-xs mt-1">{errors.nome.message}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          CPF *
+        </label>
+        <input
+          type="text"
+          placeholder="Ex: 12312312312"
+          {...register("cpf", validationRules.cpf)}
+          onChange={(e) => handleInputChange("cpf", e.target.value, "numeros")}
+          className={`w-full p-2 border rounded-lg ${
+            errors.cpf ? "border-red-500" : "border-gray-300"
+          }`}
+          maxLength={11}
+        />
+        {errors.cpf && (
+          <p className="text-red-500 text-xs mt-1">{errors.cpf.message}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Tipo Médico *
+        </label>
+        <input
+          type="text"
+          {...register("tipo_medico", validationRules.tipo_medico)}
+          onChange={(e) =>
+            handleInputChange("tipo_medico", e.target.value, "letras")
+          }
+          className={`w-full p-2 border rounded-lg ${
+            errors.tipo_medico ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.tipo_medico && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.tipo_medico.message}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+
 export default Tabelas;
