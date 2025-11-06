@@ -1245,4 +1245,64 @@ const Tabelas: React.FC = () => {
     </div>
   );
 
+  const CadastroTable = () => (
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white">
+        <thead className="bg-purple-500 text-white">
+          <tr>
+            <th className="py-3 px-4 text-left">CPF</th>
+            <th className="py-3 px-4 text-left">Email</th>
+            <th className="py-3 px-4 text-left">Status</th>
+            <th className="py-3 px-4 text-left">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cadastros.map((cadastro, index) => (
+            <tr
+              key={cadastro.cpf_cadastro}
+              className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+            >
+              <td className="py-3 px-4 border-b">{cadastro.cpf_cadastro}</td>
+              <td className="py-3 px-4 border-b">{cadastro.email}</td>
+              <td className="py-3 px-4 border-b">
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${
+                    cadastro.status === "Ativo"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {cadastro.status}
+                </span>
+              </td>
+              <td className="py-3 px-4 border-b">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(cadastro)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm transition-colors"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleDelete(cadastro.cpf_cadastro)}
+                    className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-sm transition-colors"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+          {cadastros.length === 0 && (
+            <tr>
+              <td colSpan={4} className="py-4 px-4 text-center text-gray-500">
+                Nenhum cadastro encontrado
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
 export default Tabelas;
