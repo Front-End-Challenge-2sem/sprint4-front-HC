@@ -1001,4 +1001,129 @@ const Tabelas: React.FC = () => {
     setShowConfirmModal(true);
   };
 
+    const confirmDelete = async () => {
+    if (!itemToDelete) return;
+
+    try {
+      let success = false;
+      switch (itemToDelete.type) {
+        case "usuario":
+          success = await apiService.deleteUsuario(Number(itemToDelete.id));
+          if (success) {
+            setUsuarios(
+              usuarios.filter((u) => u.id_usuario !== itemToDelete.id)
+            );
+            showMessage("Sucesso", "Item excluído com sucesso!", "success");
+          }
+          break;
+        case "medico":
+          success = await apiService.deleteMedico(Number(itemToDelete.id));
+          if (success) {
+            setMedicos(medicos.filter((m) => m.id_medico !== itemToDelete.id));
+            showMessage("Sucesso", "Item excluído com sucesso!", "success");
+          }
+          break;
+        case "cadastro":
+          success = await apiService.deleteCadastro(itemToDelete.id as string);
+          if (success) {
+            setCadastros(
+              cadastros.filter((c) => c.cpf_cadastro !== itemToDelete.id)
+            );
+            showMessage("Sucesso", "Item excluído com sucesso!", "success");
+          }
+          break;
+      }
+
+      if (!success) {
+        showMessage(
+          "Erro",
+          "Erro ao excluir item, verique se há usuários com este cadastro!",
+          "error"
+        );
+      }
+    } catch (err) {
+      showMessage(
+        "Erro",
+        "Erro ao excluir: " + (err as Error).message,
+        "error"
+      );
+    } finally {
+      setShowConfirmModal(false);
+      setItemToDelete(null);
+    }
+  };
+
+  const handleSave = async (data: FormData) => {
+    try {
+      switch (activeTab) {
+        case "usuario":
+          if (editingItem && "id_usuario" in editingItem) {
+            const updated = await apiService.updateUsuario(
+              editingItem.id_usuario,
+              data as Usuario
+            );
+            setUsuarios(
+              usuarios.map((u) =>
+                u.id_usuario === updated.id_usuario ? updated : u
+              )
+            );
+            showMessage("Sucesso", "Item atualizado com sucesso!", "success");
+          } else {
+            const newUsuario = await apiService.createUsuario(
+              data as Omit<Usuario, "id_usuario">
+            );
+            setUsuarios([...usuarios, newUsuario]);
+            showMessage("Sucesso", "Item criado com sucesso!", "success");
+          }
+          break;
+        case "medico":
+          if (editingItem && "id_medico" in editingItem) {
+            const updated = await apiService.updateMedico(
+              editingItem.id_medico,
+              data as Medico
+            );
+            setMedicos(
+              medicos.map((m) =>
+                m.id_medico === updated.id_medico ? updated : m
+              )
+            );
+            showMessage("Sucesso", "Item atualizado com sucesso!", "success");
+          } else {
+            const newMedico = await apiService.createMedico(
+              data as Omit<Medico, "id_medico">
+            );
+            setMedicos([...medicos, newMedico]);
+            showMessage("Sucesso", "Item criado com sucesso!", "success");
+          }
+          break;
+        case "cadastro":
+          if (editingItem && "cpf_cadastro" in editingItem) {
+            const cadastroToUpdate = {
+              email: data.email as string,
+              // Mantém o status original do item em edição
+              status: (editingItem as Cadastro).status,
+              senha: data.senha as string,
+            };
+
+            const updated = await apiService.updateCadastro(
+              editingItem.cpf_cadastro,
+              cadastroToUpdate
+            );
+            setCadastros(
+              cadastros.map((c) =>
+                c.cpf_cadastro === updated.cpf_cadastro ? updated : c
+              )
+            );
+            showMessage("Sucesso", "Item atualizado com sucesso!", "success");
+          }
+          break;
+      }
+      setShowModal(false);
+      setEditingItem(null);
+      handleRefresh();
+    } catch (err) {
+      showMessage("Erro", "Erro ao salvar: " + (err as Error).message, "error");
+    }
+  };
+
 export default Tabelas;
