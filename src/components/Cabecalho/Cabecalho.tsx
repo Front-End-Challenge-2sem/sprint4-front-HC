@@ -113,6 +113,53 @@ export default function Cabecalho() {
         </nav>
       </div>
 
-      
+            {/* Menu Mobile - Agora como parte do fluxo normal, não absoluto */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-white border-t border-gray-200 shadow-lg">
+          {/* Saudação do usuário logado - Mobile */}
+          {userData && (
+            <div className="px-4 py-3 border-b border-gray-100 bg-blue-50">
+              <div className="text-blue-800 text-sm font-medium">
+                Olá, <strong className="text-blue-900">{userData.nome.split(' ')[0]}</strong>!
+              </div>
+            </div>
+          )}
+          
+          <nav className="py-2">
+            <ul className="space-y-0">
+              {menuItems.map((item) => (
+                <li key={item.path}>
+                  <a 
+                    href={item.path} 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (userData && item.label === 'Login') {
+                        handleLogout();
+                      } else {
+                        navigate(item.path);
+                        setIsMenuOpen(false);
+                      }
+                    }}
+                    className={`
+                      block px-4 py-3 text-base font-medium transition-colors border-b border-gray-100
+                      ${userData && item.label === 'Login' 
+                        ? 'bg-red-500 text-white hover:bg-red-600' 
+                        : item.label === 'Login' 
+                        ? 'bg-blue-500 text-white hover:bg-blue-600'
+                        : item.label === 'Cadastro'
+                        ? 'bg-green-500 text-white hover:bg-green-600'
+                        : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
+                      }
+                    `}
+                  >
+                    {userData && item.label === 'Login' ? 'Sair' : item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </div>
+      )}
+    </header>
   );
 }
