@@ -140,4 +140,58 @@ const apiService = {
   },
 };
 
+// Funções de validação
+const validationRules = {
+  nome: {
+    required: "Nome é obrigatório",
+    pattern: {
+      value: /^[A-Za-zÀ-ÿ\s.]+$/,
+      message: "Nome não pode conter números ou caracteres especiais",
+    },
+  },
+  cpf: {
+    required: "CPF é obrigatório",
+    pattern: {
+      value: /^\d+$/,
+      message: "CPF deve conter apenas números",
+    },
+    minLength: {
+      value: 11,
+      message: "CPF deve ter exatamente 11 dígitos",
+    },
+    maxLength: {
+      value: 11,
+      message: "CPF deve ter exatamente 11 dígitos",
+    },
+  },
+  telefone: {
+    required: "Telefone é obrigatório",
+    pattern: {
+      value: /^\d+$/,
+      message: "Telefone deve conter apenas números",
+    },
+    maxLength: {
+      value: 11,
+      message: "Telefone deve ter no máximo 11 dígitos",
+    },
+  },
+  email: {
+    required: "Email é obrigatório",
+    pattern: {
+      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      message: "Email deve ser válido",
+    },
+  },
+  tipo_medico: {
+    required: "Tipo médico é obrigatório",
+    pattern: {
+      value: /^[A-Za-zÀ-ÿ\s.]+$/,
+      message: "Tipo médico não pode conter números ou caracteres especiais",
+    },
+  },
+  required: (field: string) => ({
+    required: `${field} é obrigatório`,
+  }),
+};
+
 export default Tabelas;
