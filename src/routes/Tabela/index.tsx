@@ -936,4 +936,69 @@ const Tabelas: React.FC = () => {
     loadData();
   }, [activeTab]);
 
+  const showMessage = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info"
+  ) => {
+    setModalMessage({ title, message, type });
+    setShowMessageModal(true);
+  };
+
+  const handleCreate = () => {
+    if (activeTab === "cadastro") {
+      showMessage(
+        "Criação Desabilitada",
+        "Não é possível criar novos cadastros. Apenas edição é permitida.",
+        "warning"
+      );
+      return;
+    }
+    setEditingItem(null);
+    setShowModal(true);
+  };
+
+  const handleRefresh = () => {
+    const loadData = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        let usuariosData: Usuario[] = [];
+        let medicosData: Medico[] = [];
+        let cadastrosData: Cadastro[] = [];
+
+        switch (activeTab) {
+          case "usuario":
+            usuariosData = await apiService.getUsuarios();
+            setUsuarios(usuariosData);
+            break;
+          case "medico":
+            medicosData = await apiService.getMedicos();
+            setMedicos(medicosData);
+            break;
+          case "cadastro":
+            cadastrosData = await apiService.getCadastros();
+            setCadastros(cadastrosData);
+            break;
+        }
+      } catch (err) {
+        setError("Erro ao carregar dados: " + (err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  };
+
+  const handleEdit = (item: Usuario | Medico | Cadastro) => {
+    setEditingItem(item);
+    setShowModal(true);
+  };
+
+  const handleDelete = (id: string | number) => {
+    setItemToDelete({ id, type: activeTab });
+    setShowConfirmModal(true);
+  };
+
 export default Tabelas;
