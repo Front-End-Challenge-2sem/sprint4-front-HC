@@ -877,4 +877,63 @@ const ModalForm: React.FC<ModalFormProps> = ({
   );
 };
 
+// Componente Tabelas Principal
+const Tabelas: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<EntityType>("usuario");
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [medicos, setMedicos] = useState<Medico[]>([]);
+  const [cadastros, setCadastros] = useState<Cadastro[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>("");
+  const [showModal, setShowModal] = useState(false);
+  const [editingItem, setEditingItem] = useState<
+    Usuario | Medico | Cadastro | null
+  >(null);
+
+  // Novos estados para modais
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState({
+    title: "",
+    message: "",
+    type: "info" as "success" | "error" | "warning" | "info",
+  });
+  const [itemToDelete, setItemToDelete] = useState<{
+    id: string | number;
+    type: EntityType;
+  } | null>(null);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        let usuariosData: Usuario[] = [];
+        let medicosData: Medico[] = [];
+        let cadastrosData: Cadastro[] = [];
+
+        switch (activeTab) {
+          case "usuario":
+            usuariosData = await apiService.getUsuarios();
+            setUsuarios(usuariosData);
+            break;
+          case "medico":
+            medicosData = await apiService.getMedicos();
+            setMedicos(medicosData);
+            break;
+          case "cadastro":
+            cadastrosData = await apiService.getCadastros();
+            setCadastros(cadastrosData);
+            break;
+        }
+      } catch (err) {
+        setError("Erro ao carregar dados: " + (err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [activeTab]);
+
 export default Tabelas;
