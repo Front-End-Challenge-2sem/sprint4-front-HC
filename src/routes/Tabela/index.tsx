@@ -260,4 +260,83 @@ const LoadingWithTimer: React.FC<LoadingWithTimerProps> = ({
   );
 };
 
+// Componente Modal de Confirmação
+interface ConfirmModalProps {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  type?: "success" | "error" | "warning" | "info";
+}
+
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  isOpen,
+  title,
+  message,
+  onConfirm,
+  onCancel,
+  type = "warning",
+}) => {
+  if (!isOpen) return null;
+
+  const getIcon = () => {
+    switch (type) {
+      case "success":
+        return "✅";
+      case "error":
+        return "❌";
+      case "warning":
+        return "⚠️";
+      case "info":
+        return "ℹ️";
+      default:
+        return "⚠️";
+    }
+  };
+
+  const getButtonColor = () => {
+    switch (type) {
+      case "success":
+        return "bg-green-500 hover:bg-green-600";
+      case "error":
+        return "bg-red-500 hover:bg-red-600";
+      case "warning":
+        return "bg-yellow-500 hover:bg-yellow-600";
+      case "info":
+        return "bg-blue-500 hover:bg-blue-600";
+      default:
+        return "bg-yellow-500 hover:bg-yellow-600";
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl">{getIcon()}</span>
+            <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+          </div>
+          <p className="text-gray-600 mb-6">{message}</p>
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={onCancel}
+              className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg font-semibold transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={onConfirm}
+              className={`${getButtonColor()} text-white py-2 px-6 rounded-lg font-semibold transition-colors`}
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default Tabelas;
