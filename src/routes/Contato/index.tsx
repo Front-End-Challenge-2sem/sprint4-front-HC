@@ -103,6 +103,42 @@ const MessageModal: React.FC<MessageModalProps> = ({
   );
 };
 
+export default function Contato() {
+  const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState({ 
+    title: '', 
+    message: '', 
+    type: 'info' as 'success' | 'error' | 'warning' | 'info' 
+  });
+
+  interface ContactFormData {
+    nome: string;
+    email: string;
+    telefone: string;
+    assunto: string;
+    mensagem: string;
+  }
+
+  // Configuração do useForm com validações
+  const { 
+    register, 
+    handleSubmit, 
+    formState: { errors, isSubmitting, isValid, isDirty }, 
+    reset,
+    watch,
+    trigger
+  } = useForm<ContactFormData>({
+    mode: 'onChange',
+    defaultValues: {
+      nome: '',
+      email: '',
+      telefone: '',
+      assunto: '',
+      mensagem: ''
+    }
+  });
+
   const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactFormData>();
 
   const onSubmit = (data: ContactFormData) => {
