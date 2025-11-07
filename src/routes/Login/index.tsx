@@ -81,52 +81,28 @@ const MessageModal: React.FC<MessageModalProps> = ({
     }
   };
 
-export default function Login() {
-  const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors }, setError } = useForm<TipoLogin>();
-
-  const onSubmit = (data: TipoLogin) => {
-    console.log('Dados de login:', data);
-
-    if (data.cpf === '123.456.789-00' && data.telefone === '(11) 99999-9999') {
-      alert('Login realizado com sucesso!');
-      navigate('/');
-    } else {
-      setError('root', {
-        type: 'manual',
-        message: 'CPF ou telefone incorretos. Tente novamente.'
-      });
-    }
-  };
-
-  const handleBackClick = () => {
-    navigate(-1);
-  };
-
-const formatCPF = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    if (numbers.length <= 3) return numbers;
-    if (numbers.length <= 6) return `${numbers.slice(0, 3)}.${numbers.slice(3)}`;
-    if (numbers.length <= 9) return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6)}`;
-    return `${numbers.slice(0, 3)}.${numbers.slice(3, 6)}.${numbers.slice(6, 9)}-${numbers.slice(9, 11)}`;
-  };
-
-  const formatPhone = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    if (numbers.length === 0) return '';
-    if (numbers.length <= 2) return `(${numbers}`;
-    if (numbers.length <= 6) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
-    if (numbers.length <= 10) return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 6)}-${numbers.slice(6)}`;
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7, 11)}`;
-  };
-
-  const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.target.value = formatCPF(e.target.value);
-  };
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.target.value = formatPhone(e.target.value);
-  };
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className={`bg-white rounded-lg shadow-xl w-full max-w-md border-2 ${getBackgroundColor()}`}>
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl">{getIcon()}</span>
+            <h2 className={`text-xl font-bold ${getTextColor()}`}>{title}</h2>
+          </div>
+          <p className={`${getTextColor()} mb-6`}>{message}</p>
+          <div className="flex justify-end">
+            <button
+              onClick={onClose}
+              className={`${getButtonColor()} text-white py-2 px-6 rounded-lg font-semibold transition-colors`}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 
   return(
