@@ -1,0 +1,1441 @@
+import React, { useState, useEffect } from "react";
+import { useForm } from "react-hook-form";
+
+const API_URL = import.meta.env.VITE_API_URL as string;
+
+// Tipos
+interface Usuario {
+  id_usuario: number;
+  nome: string;
+  idade: number;
+  data_nascimento: string;
+  telefone: string;
+  chatbot_id_conversa: number;
+  cadastro_cpf_cadastro: string;
+  agenda_id_agenda: number;
+  medico_id_medico: number;
+}
+
+interface Medico {
+  id_medico: number;
+  nome: string;
+  cpf: string;
+  tipo_medico: string;
+}
+
+interface Cadastro {
+  cpf_cadastro: string;
+  email: string;
+  status: string;
+  senha: string;
+}
+
+type EntityType = "usuario" | "medico" | "cadastro";
+
+type FormData = Partial<Usuario> & Partial<Medico> & Partial<Cadastro>;
+
+// Serviço da API
+const apiService = {
+  // Usuários
+  async getUsuarios(): Promise<Usuario[]> {
+    const response = await fetch(`${API_URL}/usuario`);
+    if (!response.ok) throw new Error("Erro ao buscar usuários");
+    return response.json();
+  },
+
+  async createUsuario(usuario: Omit<Usuario, "id_usuario">): Promise<Usuario> {
+    const response = await fetch(`${API_URL}/usuario`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(usuario),
+    });
+    if (!response.ok)
+      throw new Error(
+        "Erro ao criar usuário, verifique se o CPF ja está cadastrado!"
+      );
+    return response.json();
+  },
+
+  async updateUsuario(id: number, usuario: Usuario): Promise<Usuario> {
+    const response = await fetch(`${API_URL}/usuario/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(usuario),
+    });
+    if (!response.ok)
+      throw new Error(
+        "Erro ao atualizar usuário, verifique se o CPF ja está cadastrado!"
+      );
+    return response.json();
+  },
+
+  async deleteUsuario(id: number): Promise<boolean> {
+    const response = await fetch(`${API_URL}/usuario/${id}`, {
+      method: "DELETE",
+    });
+    return response.ok;
+  },
+
+  // Médicos
+  async getMedicos(): Promise<Medico[]> {
+    const response = await fetch(`${API_URL}/medico`);
+    if (!response.ok) throw new Error("Erro ao buscar médicos");
+    return response.json();
+  },
+
+  async createMedico(medico: Omit<Medico, "id_medico">): Promise<Medico> {
+    const response = await fetch(`${API_URL}/medico`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(medico),
+    });
+    if (!response.ok)
+      throw new Error("Erro ao criar médico, verifique se o CPF é válido!");
+    return response.json();
+  },
+
+  async updateMedico(id: number, medico: Medico): Promise<Medico> {
+    const response = await fetch(`${API_URL}/medico/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(medico),
+    });
+    if (!response.ok)
+      throw new Error("Erro ao atualizar médico, verifique se o CPF é válido!");
+    return response.json();
+  },
+
+  async deleteMedico(id: number): Promise<boolean> {
+    const response = await fetch(`${API_URL}/medico/${id}`, {
+      method: "DELETE",
+    });
+    return response.ok;
+  },
+
+  // Cadastros
+  async getCadastros(): Promise<Cadastro[]> {
+    const response = await fetch(`${API_URL}/cadastro`);
+    if (!response.ok) throw new Error("Erro ao buscar cadastros");
+    return response.json();
+  },
+
+  async updateCadastro(
+    cpf: string,
+    cadastro: Omit<Cadastro, "cpf_cadastro">
+  ): Promise<Cadastro> {
+    const response = await fetch(`${API_URL}/cadastro/${cpf}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(cadastro),
+    });
+    if (!response.ok) throw new Error("Erro ao atualizar cadastro");
+    return response.json();
+  },
+
+  async deleteCadastro(cpf: string): Promise<boolean> {
+    const response = await fetch(`${API_URL}/cadastro/${cpf}`, {
+      method: "DELETE",
+    });
+    return response.ok;
+  },
+};
+
+// Funções de validação
+const validationRules = {
+  nome: {
+    required: "Nome é obrigatório",
+    pattern: {
+      value: /^[A-Za-zÀ-ÿ\s.]+$/,
+      message: "Nome não pode conter números ou caracteres especiais",
+    },
+  },
+  cpf: {
+    required: "CPF é obrigatório",
+    pattern: {
+      value: /^\d+$/,
+      message: "CPF deve conter apenas números",
+    },
+    minLength: {
+      value: 11,
+      message: "CPF deve ter exatamente 11 dígitos",
+    },
+    maxLength: {
+      value: 11,
+      message: "CPF deve ter exatamente 11 dígitos",
+    },
+  },
+  telefone: {
+    required: "Telefone é obrigatório",
+    pattern: {
+      value: /^\d+$/,
+      message: "Telefone deve conter apenas números",
+    },
+    maxLength: {
+      value: 11,
+      message: "Telefone deve ter no máximo 11 dígitos",
+    },
+  },
+  email: {
+    required: "Email é obrigatório",
+    pattern: {
+      value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+      message: "Email deve ser válido",
+    },
+  },
+  tipo_medico: {
+    required: "Tipo médico é obrigatório",
+    pattern: {
+      value: /^[A-Za-zÀ-ÿ\s.]+$/,
+      message: "Tipo médico não pode conter números ou caracteres especiais",
+    },
+  },
+  required: (field: string) => ({
+    required: `${field} é obrigatório`,
+  }),
+};
+
+const formatadores = {
+  apenasNumeros: (valor: string) => valor.replace(/\D/g, ""),
+  apenasLetras: (valor: string) => valor.replace(/[^A-Za-zÀ-ÿ\s.]/g, ""),
+};
+
+// Componente de Loading com Temporizador
+interface LoadingWithTimerProps {
+  message?: string;
+}
+
+const LoadingWithTimer: React.FC<LoadingWithTimerProps> = ({
+  message = "Carregando...",
+}) => {
+  const [timeLeft, setTimeLeft] = useState<number>(120);
+
+  useEffect(() => {
+    if (timeLeft <= 0) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => prevTime - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft]);
+
+  const formatTime = (seconds: number): string => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
+  const progressPercentage = ((120 - timeLeft) / 120) * 100;
+
+  return (
+    <div className="text-center py-8">
+      <div className="inline-block animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mb-4"></div>
+      <p className="text-lg font-semibold text-gray-700 mb-2">{message}</p>
+      <div className="mb-4">
+        <div className="text-2xl font-bold text-blue-600 mb-2">
+          {formatTime(timeLeft)}
+        </div>
+        <p className="text-sm text-gray-500">Tempo estimado: 2 minutos</p>
+      </div>
+      <div className="w-full max-w-xs mx-auto bg-gray-200 rounded-full h-2 mb-4">
+        <div
+          className="bg-blue-500 h-2 rounded-full transition-all duration-1000 ease-out"
+          style={{ width: `${progressPercentage}%` }}
+        ></div>
+      </div>
+      <div className="text-sm text-gray-600">
+        {timeLeft > 100 && "Iniciando conexão com o servidor..."}
+        {timeLeft <= 100 && timeLeft > 60 && "Processando dados..."}
+        {timeLeft <= 60 && timeLeft > 30 && "Finalizando carregamento..."}
+        {timeLeft <= 30 && "Quase pronto..."}
+      </div>
+      <div className="mt-4 p-3 bg-blue-50 rounded-lg max-w-md mx-auto">
+        <p className="text-xs text-blue-700">
+          Esta operação pode levar até 2 minutos.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// Componente Modal de Confirmação
+interface ConfirmModalProps {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+  type?: "success" | "error" | "warning" | "info";
+}
+
+const ConfirmModal: React.FC<ConfirmModalProps> = ({
+  isOpen,
+  title,
+  message,
+  onConfirm,
+  onCancel,
+  type = "warning",
+}) => {
+  if (!isOpen) return null;
+
+  const getIcon = () => {
+    switch (type) {
+      case "success":
+        return "✅";
+      case "error":
+        return "❌";
+      case "warning":
+        return "⚠️";
+      case "info":
+        return "ℹ️";
+      default:
+        return "⚠️";
+    }
+  };
+
+  const getButtonColor = () => {
+    switch (type) {
+      case "success":
+        return "bg-green-500 hover:bg-green-600";
+      case "error":
+        return "bg-red-500 hover:bg-red-600";
+      case "warning":
+        return "bg-yellow-500 hover:bg-yellow-600";
+      case "info":
+        return "bg-blue-500 hover:bg-blue-600";
+      default:
+        return "bg-yellow-500 hover:bg-yellow-600";
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl">{getIcon()}</span>
+            <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+          </div>
+          <p className="text-gray-600 mb-6">{message}</p>
+          <div className="flex gap-3 justify-end">
+            <button
+              onClick={onCancel}
+              className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg font-semibold transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={onConfirm}
+              className={`${getButtonColor()} text-white py-2 px-6 rounded-lg font-semibold transition-colors`}
+            >
+              Confirmar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Componente Modal de Mensagem
+interface MessageModalProps {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  type: "success" | "error" | "warning" | "info";
+  onClose: () => void;
+}
+
+const MessageModal: React.FC<MessageModalProps> = ({
+  isOpen,
+  title,
+  message,
+  type,
+  onClose,
+}) => {
+  if (!isOpen) return null;
+
+  const getIcon = () => {
+    switch (type) {
+      case "success":
+        return "✅";
+      case "error":
+        return "❌";
+      case "warning":
+        return "⚠️";
+      case "info":
+        return "ℹ️";
+      default:
+        return "ℹ️";
+    }
+  };
+
+  const getBackgroundColor = () => {
+    switch (type) {
+      case "success":
+        return "bg-green-50 border-green-200";
+      case "error":
+        return "bg-red-50 border-red-200";
+      case "warning":
+        return "bg-yellow-50 border-yellow-200";
+      case "info":
+        return "bg-blue-50 border-blue-200";
+      default:
+        return "bg-blue-50 border-blue-200";
+    }
+  };
+
+  const getTextColor = () => {
+    switch (type) {
+      case "success":
+        return "text-green-800";
+      case "error":
+        return "text-red-800";
+      case "warning":
+        return "text-yellow-800";
+      case "info":
+        return "text-blue-800";
+      default:
+        return "text-blue-800";
+    }
+  };
+
+  const getButtonColor = () => {
+    switch (type) {
+      case "success":
+        return "bg-green-500 hover:bg-green-600";
+      case "error":
+        return "bg-red-500 hover:bg-red-600";
+      case "warning":
+        return "bg-yellow-500 hover:bg-yellow-600";
+      case "info":
+        return "bg-blue-500 hover:bg-blue-600";
+      default:
+        return "bg-blue-500 hover:bg-blue-600";
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div
+        className={`bg-white rounded-lg shadow-xl w-full max-w-md border-2 ${getBackgroundColor()}`}
+      >
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl">{getIcon()}</span>
+            <h2 className={`text-xl font-bold ${getTextColor()}`}>{title}</h2>
+          </div>
+          <p className={`${getTextColor()} mb-6`}>{message}</p>
+          <div className="flex justify-end">
+            <button
+              onClick={onClose}
+              className={`${getButtonColor()} text-white py-2 px-6 rounded-lg font-semibold transition-colors`}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Componente Modal de Formulário
+interface ModalFormProps {
+  type: EntityType;
+  item: Usuario | Medico | Cadastro | null;
+  onSave: (data: FormData) => void;
+  onClose: () => void;
+}
+
+const ModalForm: React.FC<ModalFormProps> = ({
+  type,
+  item,
+  onSave,
+  onClose,
+}) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    reset,
+  } = useForm<FormData>({
+    mode: "onChange",
+  });
+
+  useEffect(() => {
+    if (item) {
+      Object.entries(item).forEach(([key, value]) => {
+        setValue(key as keyof FormData, value as never);
+      });
+    } else {
+      reset();
+      switch (type) {
+        case "usuario":
+          setValue("nome", "");
+          setValue("idade", 0);
+          setValue("data_nascimento", "");
+          setValue("telefone", "");
+          setValue("chatbot_id_conversa", 0);
+          setValue("cadastro_cpf_cadastro", "");
+          setValue("agenda_id_agenda", 0);
+          setValue("medico_id_medico", 0);
+          break;
+        case "medico":
+          setValue("nome", "");
+          setValue("cpf", "");
+          setValue("tipo_medico", "");
+          break;
+        case "cadastro":
+          setValue("cpf_cadastro", "");
+          setValue("email", "");
+          setValue("status", "ativo");
+          setValue("senha", "");
+          break;
+      }
+    }
+  }, [item, type, setValue, reset]);
+
+  const handleInputChange = (
+    field: keyof FormData,
+    value: string,
+    tipo: "numeros" | "letras" = "numeros"
+  ) => {
+    let valorFormatado = value;
+
+    if (tipo === "numeros") {
+      valorFormatado = formatadores.apenasNumeros(value);
+    } else if (tipo === "letras") {
+      valorFormatado = formatadores.apenasLetras(value);
+    }
+
+    setValue(field, valorFormatado as never);
+  };
+
+  const onSubmit = (data: FormData) => {
+    onSave(data);
+  };
+
+  const getTitle = () => {
+    const action = item ? "Editar" : "Adicionar";
+    const entity =
+      type === "usuario"
+        ? "Usuário"
+        : type === "medico"
+        ? "Médico"
+        : "Cadastro";
+    return `${action} ${entity}`;
+  };
+
+  const renderUsuarioForm = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Nome *
+        </label>
+        <input
+          type="text"
+          {...register("nome", validationRules.nome)}
+          onChange={(e) => handleInputChange("nome", e.target.value, "letras")}
+          className={`w-full p-2 border rounded-lg ${
+            errors.nome ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.nome && (
+          <p className="text-red-500 text-xs mt-1">{errors.nome.message}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Idade *
+        </label>
+        <input
+          type="number"
+          {...register("idade", validationRules.required("Idade"))}
+          className={`w-full p-2 border rounded-lg ${
+            errors.idade ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.idade && (
+          <p className="text-red-500 text-xs mt-1">{errors.idade.message}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Data Nascimento *
+        </label>
+        <input
+          type="date"
+          {...register(
+            "data_nascimento",
+            validationRules.required("Data de nascimento")
+          )}
+          className={`w-full p-2 border rounded-lg ${
+            errors.data_nascimento ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.data_nascimento && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.data_nascimento.message}
+          </p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Telefone *
+        </label>
+        <input
+          type="text"
+          placeholder="Ex: 11912345678"
+          {...register("telefone", validationRules.telefone)}
+          onChange={(e) =>
+            handleInputChange("telefone", e.target.value, "numeros")
+          }
+          className={`w-full p-2 border rounded-lg ${
+            errors.telefone ? "border-red-500" : "border-gray-300"
+          }`}
+          maxLength={11}
+        />
+        {errors.telefone && (
+          <p className="text-red-500 text-xs mt-1">{errors.telefone.message}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Chatbot ID *
+        </label>
+        <input
+          type="number"
+          {...register(
+            "chatbot_id_conversa",
+            validationRules.required("Chatbot ID")
+          )}
+          className={`w-full p-2 border rounded-lg ${
+            errors.chatbot_id_conversa ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.chatbot_id_conversa && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.chatbot_id_conversa.message}
+          </p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          CPF Cadastro *
+        </label>
+        <input
+          type="text"
+          placeholder="Ex: 12312312312"
+          {...register("cadastro_cpf_cadastro", validationRules.cpf)}
+          onChange={(e) =>
+            handleInputChange(
+              "cadastro_cpf_cadastro",
+              e.target.value,
+              "numeros"
+            )
+          }
+          className={`w-full p-2 border rounded-lg ${
+            errors.cadastro_cpf_cadastro ? "border-red-500" : "border-gray-300"
+          }`}
+          maxLength={11}
+        />
+        {errors.cadastro_cpf_cadastro && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.cadastro_cpf_cadastro.message}
+          </p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Agenda ID *
+        </label>
+        <input
+          type="number"
+          {...register(
+            "agenda_id_agenda",
+            validationRules.required("Agenda ID")
+          )}
+          className={`w-full p-2 border rounded-lg ${
+            errors.agenda_id_agenda ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.agenda_id_agenda && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.agenda_id_agenda.message}
+          </p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Médico ID *
+        </label>
+        <input
+          type="number"
+          {...register(
+            "medico_id_medico",
+            validationRules.required("Médico ID")
+          )}
+          className={`w-full p-2 border rounded-lg ${
+            errors.medico_id_medico ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.medico_id_medico && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.medico_id_medico.message}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+
+    const renderMedicoForm = () => (
+    <div className="grid grid-cols-1 gap-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Nome *
+        </label>
+        <input
+          type="text"
+          {...register("nome", validationRules.nome)}
+          onChange={(e) => handleInputChange("nome", e.target.value, "letras")}
+          className={`w-full p-2 border rounded-lg ${
+            errors.nome ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.nome && (
+          <p className="text-red-500 text-xs mt-1">{errors.nome.message}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          CPF *
+        </label>
+        <input
+          type="text"
+          placeholder="Ex: 12312312312"
+          {...register("cpf", validationRules.cpf)}
+          onChange={(e) => handleInputChange("cpf", e.target.value, "numeros")}
+          className={`w-full p-2 border rounded-lg ${
+            errors.cpf ? "border-red-500" : "border-gray-300"
+          }`}
+          maxLength={11}
+        />
+        {errors.cpf && (
+          <p className="text-red-500 text-xs mt-1">{errors.cpf.message}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Tipo Médico *
+        </label>
+        <input
+          type="text"
+          {...register("tipo_medico", validationRules.tipo_medico)}
+          onChange={(e) =>
+            handleInputChange("tipo_medico", e.target.value, "letras")
+          }
+          className={`w-full p-2 border rounded-lg ${
+            errors.tipo_medico ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.tipo_medico && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.tipo_medico.message}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+
+  const renderCadastroForm = () => (
+    <div className="grid grid-cols-1 gap-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          CPF *
+        </label>
+        <input
+          type="text"
+          placeholder="Ex: 12312312312"
+          {...register("cpf_cadastro", {
+            ...validationRules.cpf,
+            disabled: !!item,
+          })}
+          onChange={(e) =>
+            handleInputChange("cpf_cadastro", e.target.value, "numeros")
+          }
+          className={`w-full p-2 border rounded-lg ${
+            errors.cpf_cadastro ? "border-red-500" : "border-gray-300"
+          } ${item ? "bg-gray-100 cursor-not-allowed" : ""}`}
+          maxLength={11}
+        />
+        {errors.cpf_cadastro && (
+          <p className="text-red-500 text-xs mt-1">
+            {errors.cpf_cadastro.message}
+          </p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Email *
+        </label>
+        <input
+          type="email"
+          {...register("email", validationRules.email)}
+          className={`w-full p-2 border rounded-lg ${
+            errors.email ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.email && (
+          <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Status
+        </label>
+        {item ? (
+          // Exibe o status atual como texto (somente leitura)
+          <div className="w-full p-2 border border-gray-300 rounded-lg bg-gray-50">
+            <span
+              className={`px-2 py-1 rounded-full text-xs ${
+                (item as Cadastro).status === "Ativo"
+                  ? "bg-green-100 text-green-800"
+                  : "bg-red-100 text-red-800"
+              }`}
+            >
+              {(item as Cadastro).status}
+            </span>
+            <p className="text-xs text-gray-500 mt-1">
+              O status não pode ser alterado
+            </p>
+          </div>
+        ) : (
+          // Para novos cadastros, ainda permite selecionar o status
+          <select
+            {...register("status")}
+            className="w-full p-2 border border-gray-300 rounded-lg"
+          >
+            <option value="ativo">Ativo</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        )}
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">
+          Senha *
+        </label>
+        <input
+          type="text"
+          {...register("senha", validationRules.required("Senha"))}
+          className={`w-full p-2 border rounded-lg ${
+            errors.senha ? "border-red-500" : "border-gray-300"
+          }`}
+        />
+        {errors.senha && (
+          <p className="text-red-500 text-xs mt-1">{errors.senha.message}</p>
+        )}
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="p-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            {getTitle()}
+          </h2>
+
+          <form onSubmit={handleSubmit(onSubmit)}>
+            {type === "usuario" && renderUsuarioForm()}
+            {type === "medico" && renderMedicoForm()}
+            {type === "cadastro" && renderCadastroForm()}
+
+            <div className="flex gap-3 mt-6">
+              <button
+                type="submit"
+                className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-6 rounded-lg font-semibold transition-colors"
+              >
+                Salvar
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-6 rounded-lg font-semibold transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Componente Tabelas Principal
+const Tabelas: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<EntityType>("usuario");
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
+  const [medicos, setMedicos] = useState<Medico[]>([]);
+  const [cadastros, setCadastros] = useState<Cadastro[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>("");
+  const [showModal, setShowModal] = useState(false);
+  const [editingItem, setEditingItem] = useState<
+    Usuario | Medico | Cadastro | null
+  >(null);
+
+  // Novos estados para modais
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showMessageModal, setShowMessageModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState({
+    title: "",
+    message: "",
+    type: "info" as "success" | "error" | "warning" | "info",
+  });
+  const [itemToDelete, setItemToDelete] = useState<{
+    id: string | number;
+    type: EntityType;
+  } | null>(null);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        let usuariosData: Usuario[] = [];
+        let medicosData: Medico[] = [];
+        let cadastrosData: Cadastro[] = [];
+
+        switch (activeTab) {
+          case "usuario":
+            usuariosData = await apiService.getUsuarios();
+            setUsuarios(usuariosData);
+            break;
+          case "medico":
+            medicosData = await apiService.getMedicos();
+            setMedicos(medicosData);
+            break;
+          case "cadastro":
+            cadastrosData = await apiService.getCadastros();
+            setCadastros(cadastrosData);
+            break;
+        }
+      } catch (err) {
+        setError("Erro ao carregar dados: " + (err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [activeTab]);
+
+  const showMessage = (
+    title: string,
+    message: string,
+    type: "success" | "error" | "warning" | "info" = "info"
+  ) => {
+    setModalMessage({ title, message, type });
+    setShowMessageModal(true);
+  };
+
+  const handleCreate = () => {
+    if (activeTab === "cadastro") {
+      showMessage(
+        "Criação Desabilitada",
+        "Não é possível criar novos cadastros. Apenas edição é permitida.",
+        "warning"
+      );
+      return;
+    }
+    setEditingItem(null);
+    setShowModal(true);
+  };
+
+  const handleRefresh = () => {
+    const loadData = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        let usuariosData: Usuario[] = [];
+        let medicosData: Medico[] = [];
+        let cadastrosData: Cadastro[] = [];
+
+        switch (activeTab) {
+          case "usuario":
+            usuariosData = await apiService.getUsuarios();
+            setUsuarios(usuariosData);
+            break;
+          case "medico":
+            medicosData = await apiService.getMedicos();
+            setMedicos(medicosData);
+            break;
+          case "cadastro":
+            cadastrosData = await apiService.getCadastros();
+            setCadastros(cadastrosData);
+            break;
+        }
+      } catch (err) {
+        setError("Erro ao carregar dados: " + (err as Error).message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  };
+
+  const handleEdit = (item: Usuario | Medico | Cadastro) => {
+    setEditingItem(item);
+    setShowModal(true);
+  };
+
+  const handleDelete = (id: string | number) => {
+    setItemToDelete({ id, type: activeTab });
+    setShowConfirmModal(true);
+  };
+
+    const confirmDelete = async () => {
+    if (!itemToDelete) return;
+
+    try {
+      let success = false;
+      switch (itemToDelete.type) {
+        case "usuario":
+          success = await apiService.deleteUsuario(Number(itemToDelete.id));
+          if (success) {
+            setUsuarios(
+              usuarios.filter((u) => u.id_usuario !== itemToDelete.id)
+            );
+            showMessage("Sucesso", "Item excluído com sucesso!", "success");
+          }
+          break;
+        case "medico":
+          success = await apiService.deleteMedico(Number(itemToDelete.id));
+          if (success) {
+            setMedicos(medicos.filter((m) => m.id_medico !== itemToDelete.id));
+            showMessage("Sucesso", "Item excluído com sucesso!", "success");
+          }
+          break;
+        case "cadastro":
+          success = await apiService.deleteCadastro(itemToDelete.id as string);
+          if (success) {
+            setCadastros(
+              cadastros.filter((c) => c.cpf_cadastro !== itemToDelete.id)
+            );
+            showMessage("Sucesso", "Item excluído com sucesso!", "success");
+          }
+          break;
+      }
+
+      if (!success) {
+        showMessage(
+          "Erro",
+          "Erro ao excluir item, verique se há usuários com este cadastro!",
+          "error"
+        );
+      }
+    } catch (err) {
+      showMessage(
+        "Erro",
+        "Erro ao excluir: " + (err as Error).message,
+        "error"
+      );
+    } finally {
+      setShowConfirmModal(false);
+      setItemToDelete(null);
+    }
+  };
+
+  const handleSave = async (data: FormData) => {
+    try {
+      switch (activeTab) {
+        case "usuario":
+          if (editingItem && "id_usuario" in editingItem) {
+            const updated = await apiService.updateUsuario(
+              editingItem.id_usuario,
+              data as Usuario
+            );
+            setUsuarios(
+              usuarios.map((u) =>
+                u.id_usuario === updated.id_usuario ? updated : u
+              )
+            );
+            showMessage("Sucesso", "Item atualizado com sucesso!", "success");
+          } else {
+            const newUsuario = await apiService.createUsuario(
+              data as Omit<Usuario, "id_usuario">
+            );
+            setUsuarios([...usuarios, newUsuario]);
+            showMessage("Sucesso", "Item criado com sucesso!", "success");
+          }
+          break;
+        case "medico":
+          if (editingItem && "id_medico" in editingItem) {
+            const updated = await apiService.updateMedico(
+              editingItem.id_medico,
+              data as Medico
+            );
+            setMedicos(
+              medicos.map((m) =>
+                m.id_medico === updated.id_medico ? updated : m
+              )
+            );
+            showMessage("Sucesso", "Item atualizado com sucesso!", "success");
+          } else {
+            const newMedico = await apiService.createMedico(
+              data as Omit<Medico, "id_medico">
+            );
+            setMedicos([...medicos, newMedico]);
+            showMessage("Sucesso", "Item criado com sucesso!", "success");
+          }
+          break;
+        case "cadastro":
+          if (editingItem && "cpf_cadastro" in editingItem) {
+            const cadastroToUpdate = {
+              email: data.email as string,
+              // Mantém o status original do item em edição
+              status: (editingItem as Cadastro).status,
+              senha: data.senha as string,
+            };
+
+            const updated = await apiService.updateCadastro(
+              editingItem.cpf_cadastro,
+              cadastroToUpdate
+            );
+            setCadastros(
+              cadastros.map((c) =>
+                c.cpf_cadastro === updated.cpf_cadastro ? updated : c
+              )
+            );
+            showMessage("Sucesso", "Item atualizado com sucesso!", "success");
+          }
+          break;
+      }
+      setShowModal(false);
+      setEditingItem(null);
+      handleRefresh();
+    } catch (err) {
+      showMessage("Erro", "Erro ao salvar: " + (err as Error).message, "error");
+    }
+  };
+
+  const tabs = [
+    { id: "usuario" as EntityType, label: "Usuários" },
+    { id: "medico" as EntityType, label: "Médicos" },
+    { id: "cadastro" as EntityType, label: "Cadastros" },
+  ];
+
+  // Componentes de tabela (mantidos iguais)
+  const UsuarioTable = () => (
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white">
+        <thead className="bg-blue-500 text-white">
+          <tr>
+            <th className="py-3 px-4 text-left">ID</th>
+            <th className="py-3 px-4 text-left">Nome</th>
+            <th className="py-3 px-4 text-left">Idade</th>
+            <th className="py-3 px-4 text-left">Data Nasc.</th>
+            <th className="py-3 px-4 text-left">Telefone</th>
+            <th className="py-3 px-4 text-left">CPF Cadastro</th>
+            <th className="py-3 px-4 text-left">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {usuarios.map((usuario, index) => (
+            <tr
+              key={usuario.id_usuario}
+              className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+            >
+              <td className="py-3 px-4 border-b">{usuario.id_usuario}</td>
+              <td className="py-3 px-4 border-b">{usuario.nome}</td>
+              <td className="py-3 px-4 border-b">{usuario.idade}</td>
+              <td className="py-3 px-4 border-b">
+                {new Date(usuario.data_nascimento).toLocaleDateString("pt-BR")}
+              </td>
+              <td className="py-3 px-4 border-b">{usuario.telefone}</td>
+              <td className="py-3 px-4 border-b">
+                {usuario.cadastro_cpf_cadastro}
+              </td>
+              <td className="py-3 px-4 border-b">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(usuario)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm transition-colors"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleDelete(usuario.id_usuario)}
+                    className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-sm transition-colors"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+          {usuarios.length === 0 && (
+            <tr>
+              <td colSpan={7} className="py-4 px-4 text-center text-gray-500">
+                Nenhum usuário encontrado
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const MedicoTable = () => (
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white">
+        <thead className="bg-green-500 text-white">
+          <tr>
+            <th className="py-3 px-4 text-left">ID</th>
+            <th className="py-3 px-4 text-left">Nome</th>
+            <th className="py-3 px-4 text-left">CPF</th>
+            <th className="py-3 px-4 text-left">Tipo</th>
+            <th className="py-3 px-4 text-left">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {medicos.map((medico, index) => (
+            <tr
+              key={medico.id_medico}
+              className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+            >
+              <td className="py-3 px-4 border-b">{medico.id_medico}</td>
+              <td className="py-3 px-4 border-b">{medico.nome}</td>
+              <td className="py-3 px-4 border-b">{medico.cpf}</td>
+              <td className="py-3 px-4 border-b">{medico.tipo_medico}</td>
+              <td className="py-3 px-4 border-b">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(medico)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm transition-colors"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleDelete(medico.id_medico)}
+                    className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-sm transition-colors"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+          {medicos.length === 0 && (
+            <tr>
+              <td colSpan={5} className="py-4 px-4 text-center text-gray-500">
+                Nenhum médico encontrado
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  const CadastroTable = () => (
+    <div className="overflow-x-auto">
+      <table className="min-w-full bg-white">
+        <thead className="bg-purple-500 text-white">
+          <tr>
+            <th className="py-3 px-4 text-left">CPF</th>
+            <th className="py-3 px-4 text-left">Email</th>
+            <th className="py-3 px-4 text-left">Status</th>
+            <th className="py-3 px-4 text-left">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {cadastros.map((cadastro, index) => (
+            <tr
+              key={cadastro.cpf_cadastro}
+              className={index % 2 === 0 ? "bg-gray-50" : "bg-white"}
+            >
+              <td className="py-3 px-4 border-b">{cadastro.cpf_cadastro}</td>
+              <td className="py-3 px-4 border-b">{cadastro.email}</td>
+              <td className="py-3 px-4 border-b">
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${
+                    cadastro.status === "Ativo"
+                      ? "bg-green-100 text-green-800"
+                      : "bg-red-100 text-red-800"
+                  }`}
+                >
+                  {cadastro.status}
+                </span>
+              </td>
+              <td className="py-3 px-4 border-b">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(cadastro)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white py-1 px-3 rounded text-sm transition-colors"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    onClick={() => handleDelete(cadastro.cpf_cadastro)}
+                    className="bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded text-sm transition-colors"
+                  >
+                    Excluir
+                  </button>
+                </div>
+              </td>
+            </tr>
+          ))}
+          {cadastros.length === 0 && (
+            <tr>
+              <td colSpan={4} className="py-4 px-4 text-center text-gray-500">
+                Nenhum cadastro encontrado
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
+  );
+
+  return (
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold text-blue-600 mb-8 text-center">
+        Gerenciamento do Sistema
+      </h1>
+
+      {/* Tabs */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
+              activeTab === tab.id
+                ? "bg-blue-500 text-white shadow-lg"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Botões de Ação */}
+      <div className="mb-6 flex flex-wrap gap-3">
+        {/* Botão Adicionar */}
+        <button
+          onClick={handleCreate}
+          className={`py-3 px-6 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2 ${
+            activeTab === "cadastro"
+              ? "bg-gray-400 text-white cursor-not-allowed"
+              : "bg-green-500 hover:bg-green-600 text-white"
+          }`}
+          disabled={activeTab === "cadastro"}
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 4v16m8-8H4"
+            />
+          </svg>
+          {activeTab === "cadastro"
+            ? "Criação Desabilitada"
+            : `Adicionar ${tabs.find((t) => t.id === activeTab)?.label}`}
+        </button>
+
+        {/* Botão Atualizar */}
+        <button
+          onClick={handleRefresh}
+          disabled={loading}
+          className="py-3 px-6 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white disabled:bg-blue-300 disabled:cursor-not-allowed"
+        >
+          <svg
+            className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
+          Atualizar Dados
+        </button>
+      </div>
+
+      {/* Mensagem de Erro */}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+          {error}
+        </div>
+      )}
+
+      {/* Loading com Temporizador */}
+      {loading && <LoadingWithTimer />}
+
+      {/* Tabelas */}
+      {!loading && (
+        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+          {activeTab === "usuario" && <UsuarioTable />}
+          {activeTab === "medico" && <MedicoTable />}
+          {activeTab === "cadastro" && <CadastroTable />}
+        </div>
+      )}
+
+      {/* Modal de Formulário */}
+      {showModal && (
+        <ModalForm
+          type={activeTab}
+          item={editingItem}
+          onSave={handleSave}
+          onClose={() => {
+            setShowModal(false);
+            setEditingItem(null);
+          }}
+        />
+      )}
+
+      {/* Modal de Confirmação para Exclusão */}
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja excluir este item? Esta ação não pode ser desfeita."
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          setShowConfirmModal(false);
+          setItemToDelete(null);
+        }}
+        type="warning"
+      />
+
+      {/* Modal de Mensagem */}
+      <MessageModal
+        isOpen={showMessageModal}
+        title={modalMessage.title}
+        message={modalMessage.message}
+        type={modalMessage.type}
+        onClose={() => setShowMessageModal(false)}
+      />
+    </div>
+  );
+};
+
+export default Tabelas;

@@ -11,6 +11,7 @@ import "tailwindcss"
 import Contato from './routes/Contato/index.tsx'
 import Login from './routes/Login/index.tsx'
 import Cadastro from './routes/Cadastro/index.tsx'
+import Tabelas from './routes/Tabela/index.tsx'
 
 const router = createBrowserRouter([
   {path: "/", element: <App/>, errorElement: <Error/>, children:[
@@ -20,7 +21,8 @@ const router = createBrowserRouter([
     {path:"/integrantes", element:<Integrantes/>},
     {path:"/guia", element:<Guia/>},
     {path:"/login", element:<Login/>},
-    {path:"/cadastro", element:<Cadastro/>}
+    {path:"/cadastro", element:<Cadastro/>},
+    {path:"/tabela", element: <Tabelas/>}
   ]}
 ])
 
