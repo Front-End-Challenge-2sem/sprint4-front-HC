@@ -333,76 +333,136 @@ export default function Contato() {
             )}
           </div>
 
-      <form className="form-contato" onSubmit={handleSubmit(onSubmit)}>
-        
-        <div className="form-grupo">
-          <label htmlFor="nome">Nome Completo*</label>
-          <input
-            id="nome"
-            type="text"
-            {...register("nome", { required: "Por favor, insira seu nome" })}
-          />
-          {errors.nome && <span className="mensagem-erro">{errors.nome.message}</span>}
-        </div>
+      {/* Campo Email */}
+          <div className="form-grupo">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              Email*
+            </label>
+            <input
+              id="email"
+              type="email"
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.email ? 'border-red-500 bg-red-50' : 'border-gray-300'
+              }`}
+              placeholder="seu@email.com"
+              {...register("email", validationRules.email)}
+              onBlur={() => trigger('email')}
+            />
+            {errors.email && (
+              <span className="text-red-500 text-sm mt-1 block">{errors.email.message}</span>
+            )}
+          </div>
 
-        
-        <div className="form-grupo">
-          <label htmlFor="email">Email*</label>
-          <input
-            id="email"
-            type="email"
-            {...register("email", {
-              required: "Por favor, insira seu email",
-              pattern: {
-                value: /\S+@\S+\.\S+/,
-                message: "Por favor, insira um email válido",
-              },
-            })}
-          />
-          {errors.email && <span className="mensagem-erro">{errors.email.message}</span>}
-        </div>
+          {/* Campo Telefone */}
+          <div className="form-grupo">
+            <label htmlFor="telefone" className="block text-sm font-medium text-gray-700 mb-2">
+              Telefone
+            </label>
+            <input
+              id="telefone"
+              type="tel"
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.telefone ? 'border-red-500 bg-red-50' : 'border-gray-300'
+              }`}
+              placeholder="(11) 99999-9999"
+              maxLength={15} // CORREÇÃO: Máximo de caracteres visíveis
+              {...register("telefone", validationRules.telefone)}
+              onChange={handlePhoneChange}
+              onBlur={() => trigger('telefone')}
+            />
+            {errors.telefone && (
+              <span className="text-red-500 text-sm mt-1 block">{errors.telefone.message}</span>
+            )}
+            <div className="text-sm text-gray-500 mt-1">
+              {watch('telefone')?.replace(/\D/g, '').length || 0}/11 dígitos
+            </div>
+          </div>
 
-        
-        <div className="form-grupo">
-          <label htmlFor="telefone">Telefone</label>
-          <input
-            id="telefone"
-            type="tel"
-            {...register("telefone")}
-          />
-        </div>
+          {/* Campo Assunto */}
+          <div className="form-grupo">
+            <label htmlFor="assunto" className="block text-sm font-medium text-gray-700 mb-2">
+              Assunto*
+            </label>
+            <select
+              id="assunto"
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.assunto ? 'border-red-500 bg-red-50' : 'border-gray-300'
+              }`}
+              {...register("assunto", validationRules.assunto)}
+              onBlur={() => trigger('assunto')}
+            >
+              <option value="">Selecione um assunto...</option>
+              <option value="duvida">Dúvida</option>
+              <option value="sugestao">Sugestão</option>
+              <option value="reclamacao">Reclamação</option>
+              <option value="elogio">Elogio</option>
+              <option value="outro">Outro</option>
+            </select>
+            {errors.assunto && (
+              <span className="text-red-500 text-sm mt-1 block">{errors.assunto.message}</span>
+            )}
+          </div>
 
-        
-        <div className="form-grupo">
-          <label htmlFor="assunto">Assunto*</label>
-          <select
-            id="assunto"
-            {...register("assunto", { required: "Por favor, selecione um assunto" })}
+          {/* Campo Mensagem */}
+          <div className="form-grupo">
+            <label htmlFor="mensagem" className="block text-sm font-medium text-gray-700 mb-2">
+              Mensagem*
+            </label>
+            <textarea
+              id="mensagem"
+              rows={5}
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors resize-vertical ${
+                errors.mensagem ? 'border-red-500 bg-red-50' : 'border-gray-300'
+              }`}
+              placeholder="Digite sua mensagem aqui..."
+              {...register("mensagem", validationRules.mensagem)}
+              onBlur={() => trigger('mensagem')}
+            />
+            {errors.mensagem && (
+              <span className="text-red-500 text-sm mt-1 block">{errors.mensagem.message}</span>
+            )}
+            <div className="text-sm text-gray-500 mt-1">
+              {watch('mensagem')?.length || 0}/1000 caracteres
+            </div>
+          </div>
+
+          {/* Botão de Envio */}
+          <button 
+            type="submit" 
+            disabled={isSubmitting || !isValid || !isDirty}
+            className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
+              isSubmitting || !isValid || !isDirty
+                ? 'bg-gray-400 cursor-not-allowed text-gray-200'
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+            }`}
           >
-            <option value="">Selecione...</option>
-            <option value="duvida">Dúvida</option>
-            <option value="sugestao">Sugestão</option>
-            <option value="reclamacao">Reclamação</option>
-            <option value="outro">Outro</option>
-          </select>
-          {errors.assunto && <span className="mensagem-erro">{errors.assunto.message}</span>}
-        </div>
+            {isSubmitting ? (
+              <div className="flex items-center justify-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Enviando...
+              </div>
+            ) : (
+              'Enviar Mensagem'
+            )}
+          </button>
 
-        
-        <div className="form-grupo">
-          <label htmlFor="mensagem">Mensagem*</label>
-          <textarea
-            id="mensagem"
-            rows={5}
-            {...register("mensagem", { required: "Por favor, insira sua mensagem" })}
-          />
-          {errors.mensagem && <span className="mensagem-erro">{errors.mensagem.message}</span>}
-        </div>
+          {/* Indicador de validação */}
+          <div className="text-center">
+            {isValid && isDirty && (
+              <p className="text-green-600 text-sm">✓ Formulário válido e pronto para envio</p>
+            )}
+          </div>
+        </form>
+      </div>
 
-        
-        <button type="submit" className="botao">
-          Enviar Mensagem
-        </button>
-      </form>
+      {/* Modal de Mensagem */}
+      <MessageModal
+        isOpen={showModal}
+        title={modalMessage.title}
+        message={modalMessage.message}
+        type={modalMessage.type}
+        onClose={() => setShowModal(false)}
+      />
     </div>
-  )
+  );
+}
