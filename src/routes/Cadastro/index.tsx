@@ -1,25 +1,186 @@
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
 import type { TipoCadastro } from "../../types/tipoCadastro";
+
+// Componente Modal de Mensagem
+interface MessageModalProps {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  onClose: () => void;
+}
+
+const MessageModal: React.FC<MessageModalProps> = ({ 
+  isOpen, 
+  title, 
+  message, 
+  type, 
+  onClose 
+}) => {
+  if (!isOpen) return null;
+
+  const getIcon = () => {
+    switch (type) {
+      case 'success':
+        return '✅';
+      case 'error':
+        return '❌';
+      case 'warning':
+        return '⚠️';
+      case 'info':
+        return 'ℹ️';
+      default:
+        return 'ℹ️';
+    }
+  };
+
+    const getBackgroundColor = () => {
+    switch (type) {
+      case 'success':
+        return 'bg-green-50 border-green-200';
+      case 'error':
+        return 'bg-red-50 border-red-200';
+      case 'warning':
+        return 'bg-yellow-50 border-yellow-200';
+      case 'info':
+        return 'bg-blue-50 border-blue-200';
+      default:
+        return 'bg-blue-50 border-blue-200';
+    }
+  };
+
+  const getTextColor = () => {
+    switch (type) {
+      case 'success':
+        return 'text-green-800';
+      case 'error':
+        return 'text-red-800';
+      case 'warning':
+        return 'text-yellow-800';
+      case 'info':
+        return 'text-blue-800';
+      default:
+        return 'text-blue-800';
+    }
+  };
+
+  const getButtonColor = () => {
+    switch (type) {
+      case 'success':
+        return 'bg-green-500 hover:bg-green-600';
+      case 'error':
+        return 'bg-red-500 hover:bg-red-600';
+      case 'warning':
+        return 'bg-yellow-500 hover:bg-yellow-600';
+      case 'info':
+        return 'bg-blue-500 hover:bg-blue-600';
+      default:
+        return 'bg-blue-500 hover:bg-blue-600';
+    }
+  };
+
+    return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className={`bg-white rounded-lg shadow-xl w-full max-w-md border-2 ${getBackgroundColor()}`}>
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl">{getIcon()}</span>
+            <h2 className={`text-xl font-bold ${getTextColor()}`}>{title}</h2>
+          </div>
+          <p className={`${getTextColor()} mb-6`}>{message}</p>
+          <div className="flex justify-end">
+            <button
+              onClick={onClose}
+              className={`${getButtonColor()} text-white py-2 px-6 rounded-lg font-semibold transition-colors`}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function Cadastro() {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors }, watch, setError } = useForm<TipoCadastro>();
+  const { register, handleSubmit, formState: { errors, isSubmitting }, watch, setError } = useForm<TipoCadastro>();
   const termosAceitos = watch('termos');
+  
+  // Estados para os modals
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState({ 
+    title: '', 
+    message: '', 
+    type: 'info' as 'success' | 'error' | 'warning' | 'info' 
+  });
 
-  const onSubmit = (data: TipoCadastro) => {
-    console.log('Dados de cadastro:', data);
-
-    if (data.email.includes('exemplo')) {
-      setError('email', { type: 'manual', message: 'Este email já está em uso' });
-      return;
-    }
-
-    alert('Cadastro realizado com sucesso! Verifique seu email para confirmar a conta.');
-    navigate('/login');
+  const showMessage = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+    setModalMessage({ title, message, type });
+    setShowModal(true);
   };
 
-  const handleBackClick = () => navigate(-1);
+  const onSubmit = async (data: TipoCadastro) => {
+    try {
+      console.log('Dados de cadastro:', data);
+
+      // Simula uma validação de email
+      if (data.email.includes('exemplo')) {
+        setError('email', { type: 'manual', message: 'Este email já está em uso' });
+        showMessage(
+          "Email em Uso", 
+          "Este email já está cadastrado em nosso sistema. Por favor, use outro email.", 
+          'error'
+        );
+        return;
+      }
+
+      // Simula processamento do cadastro
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Salvar dados do usuário no localStorage/sessionStorage
+      const userData = {
+        cpf: data.cpf,
+        telefone: data.telefone,
+        nome: data.nome,
+        email: data.email,
+        dataNascimento: data.dataNascimento
+      };
+
+      // Salvar no localStorage para simular cadastro
+      localStorage.setItem('userData', JSON.stringify(userData));
+      
+      // Mostrar modal de sucesso
+      showMessage(
+        "Cadastro Realizado!", 
+        "Seu cadastro foi realizado com sucesso! Redirecionando para a página de login...", 
+        'success'
+      );
+      
+      // Redirecionar para login após fechar o modal
+      setTimeout(() => {
+        navigate('/login', { 
+          state: { 
+            cadastroSucesso: true,
+            cpf: data.cpf,
+            telefone: data.telefone 
+          } 
+        });
+      }, 2000);
+      
+    } catch {
+      // CORREÇÃO: Removido parâmetro 'error' não utilizado
+      showMessage(
+        "Erro no Cadastro", 
+        "Houve um erro ao processar seu cadastro. Por favor, tente novamente.", 
+        'error'
+      );
+    }
+  };
+
+    const handleBackClick = () => navigate(-1);
 
   const formatCPF = (value: string) => {
     const numbers = value.replace(/\D/g, '');
@@ -40,10 +201,10 @@ export default function Cadastro() {
 
   const handleCPFChange = (e: React.ChangeEvent<HTMLInputElement>) => e.target.value = formatCPF(e.target.value);
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => e.target.value = formatPhone(e.target.value);
+  
 
   return (
     <div className="cadastro-container">
-
       
       <div className="voltar">
         <button onClick={handleBackClick} className="botao-voltar">
@@ -123,12 +284,13 @@ export default function Cadastro() {
             </div>
 
             <div className="campo-form">
-              <label htmlFor="telefone">Telefone</label>
+              <label htmlFor="telefone">Telefone *</label>
               <input
                 id="telefone"
                 type="tel"
                 placeholder="(00) 00000-0000"
                 {...register('telefone', {
+                  required: 'Telefone é obrigatório',
                   pattern: { value: /^\(\d{2}\) \d{4,5}-\d{4}$/, message: 'Telefone deve estar no formato (00) 00000-0000' }
                 })}
                 onChange={handlePhoneChange}
@@ -157,18 +319,36 @@ export default function Cadastro() {
             </div>
 
             <div className="campo-form">
-              <label>
+              <label className="flex items-start gap-2">
                 <input
                   type="checkbox"
+                  className="mt-1"
                   {...register('termos', { required: 'Você deve aceitar os termos de uso' })}
-                />{' '}
-                Eu concordo com os <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a>
+                />
+                <span>
+                  Eu concordo com os <a href="#" className="text-blue-600 hover:text-blue-800">Termos de Uso</a> e <a href="#" className="text-blue-600 hover:text-blue-800">Política de Privacidade</a>
+                </span>
               </label>
               {errors.termos && <p className="mensagem-erro">{errors.termos.message}</p>}
             </div>
 
-            <button type="submit" disabled={!termosAceitos} className="botao">
-              Cadastrar
+            <button 
+              type="submit" 
+              disabled={!termosAceitos || isSubmitting}
+              className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
+                !termosAceitos || isSubmitting
+                  ? 'bg-gray-400 cursor-not-allowed text-gray-200'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+              }`}
+            >
+              {isSubmitting ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Processando...
+                </div>
+              ) : (
+                'Cadastrar'
+              )}
             </button>
           </form>
 
@@ -189,6 +369,15 @@ export default function Cadastro() {
 
         </div>
       </div>
+
+      {/* Modal de Mensagem */}
+      <MessageModal
+        isOpen={showModal}
+        title={modalMessage.title}
+        message={modalMessage.message}
+        type={modalMessage.type}
+        onClose={() => setShowModal(false)}
+      />
     </div>
   );
 }
