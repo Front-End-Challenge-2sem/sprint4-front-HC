@@ -1,5 +1,19 @@
 # 📋 Grupo AGJ
 
+## 🌐 Links Importantes
+
+- 📊 **GitHub do Projeto:** https://github.com/Front-End-Challenge-2sem/sprint4-front-HC
+- 🎥 **Vídeo Demonstrativo no YouTube:** (em andamento)
+
+---
+
+## 🌐 Link do Deploy na Plataforma Vercel
+
+🔗 **Acesse aqui:** [sprint4-front-blond.vercel.app](https://sprint4-front-blond.vercel.app)
+
+---
+
+
 ## Sobre o Projeto
 O **Grupo AGJ** é uma plataforma web desenvolvida para facilitar o acesso à saúde digital para pessoas que têm dificuldade com tecnologia.  
 Oferecemos uma interface intuitiva, recursos de acessibilidade e suporte personalizado para ajudar usuários a marcar consultas e utilizar serviços de saúde online.
@@ -13,7 +27,7 @@ Oferecemos uma interface intuitiva, recursos de acessibilidade e suporte persona
 - **Validação de Formulários:** React Hook Form  
 - **Roteamento:** React Router DOM  
 - **Ícones:** SVG inline e imagens PNG  
-
+- **Deploy:** Vercel  
 
 ---
 
@@ -35,47 +49,58 @@ Abaixo estão algumas capturas de tela das principais páginas do **Grupo AGJ**:
 ---
 
 ### 🏠 Página Inicial (Index)
-<img src="https://github.com/user-attachments/assets/2db9d927-ab89-410d-bf5a-59658d994648" alt="Index" width="800"/>
+<img width="1902" height="908" alt="image" src="https://github.com/user-attachments/assets/b1987a39-7c8c-4446-b8c9-9c1ed1b79f76" />
 
 ---
 
 ### 📖 Guia Interativo
-<img src="https://github.com/user-attachments/assets/8ec73d7f-aa2a-464c-8d97-5144b8b850b2" alt="Guia" width="800"/>
+<img width="1902" height="908" alt="image" src="https://github.com/user-attachments/assets/dd216be4-4bab-4efc-bba9-972a9af601b1" />
 
 ---
 
 ### ❓ FAQ Dinâmico
-<img src="https://github.com/user-attachments/assets/73e6dfe2-1d06-40c5-b58b-477d9a638504" alt="FAQ" width="800"/>
+<img width="1902" height="908" alt="image" src="https://github.com/user-attachments/assets/a88bd837-7f89-48cd-983c-e8335b6431dc" />
 
 ---
 
 ### 📞 Contato
-<img src="https://github.com/user-attachments/assets/3bf44705-eeb8-4029-86e2-9c84b1c32466" alt="Contato" width="800"/>
+<img width="1902" height="908" alt="image" src="https://github.com/user-attachments/assets/20717f7e-d2af-4b86-8c8f-a5debef56ff8" />
 
 ---
 
 ### 👥 Integrantes
-<img src="https://github.com/user-attachments/assets/a2bbe93a-fd9c-407d-8739-d8013e6b500b" alt="Integrantes" width="800"/>
+<img width="1902" height="908" alt="image" src="https://github.com/user-attachments/assets/a8a3e0a0-e8d3-4d78-8d4a-c84fe040df47" />
+
+---
+
+### 📊 Tabela (usuário)
+<img width="1902" height="908" alt="image" src="https://github.com/user-attachments/assets/729cf839-7b04-4915-8961-8fd754b64329" />
+
+---
+
+### 📊 Tabela (médico)
+<img width="1902" height="908" alt="image" src="https://github.com/user-attachments/assets/5b78cc55-6385-4ef0-b7cc-836ea8ee7f1d" />
+
+---
+
+### 📊 Tabela (cadastro)
+<img width="1902" height="908" alt="image" src="https://github.com/user-attachments/assets/99f46fb5-35a1-4046-abde-5f669369093b" />
 
 ---
 
 ### 🔐 Login
-<img src="https://github.com/user-attachments/assets/c6e843a5-7927-4faf-a7f7-b417262227af" alt="Login" width="800"/>
+<img width="1902" height="908" alt="image" src="https://github.com/user-attachments/assets/f6517b60-1f3f-49bf-8a9c-331f30eab0c5" />
 
 ---
 
 ### 📝 Cadastro
-<img src="https://github.com/user-attachments/assets/ed80ebe0-869a-4b3d-aca5-dc4b96c6e5e7" alt="Cadastro" width="800"/>
-
-
-
-
+<img width="1902" height="908" alt="image" src="https://github.com/user-attachments/assets/7a1d33fa-5349-4e44-a8e0-c4ec435c3b5d" />
 
 ---
 
 ## 📁 Estrutura de Pastas do Projeto
 ```text
-projeto-saude-digital/
+sprint4-front/
 ├── public/
 │   └── assets/
 │       └── img/
@@ -114,6 +139,8 @@ projeto-saude-digital/
 │   │   │   └── index.tsx
 │   │   ├── Integrantes/
 │   │   │   └── index.tsx
+│   │   ├── Tabela/
+│   │   │   └── index.tsx
 │   │   └── Error/
 │   │       └── index.tsx
 │   ├── types/
@@ -131,6 +158,7 @@ projeto-saude-digital/
 │   ├── globals.css
 │   ├── main.tsx
 │   ├── vite-env.d.ts
+├── .env
 ├── .gitignore
 ├── eslint.config.js
 ├── index.html
@@ -151,9 +179,3 @@ projeto-saude-digital/
 - 📝 **Textos Claros:** Linguagem simples e direta  
 
 ---
-
-## 🌐 Links Importantes
-
-- 📊 **GitHub do Projeto:** https://github.com/Front-End-Challenge-2sem/Sprint3-front-HC
-- 🎥 **Vídeo Demonstrativo no YouTube:** https://www.youtube.com/watch?v=pbrdas3-loU
-
