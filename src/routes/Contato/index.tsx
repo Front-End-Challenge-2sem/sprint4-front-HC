@@ -139,6 +139,85 @@ export default function Contato() {
     }
   });
 
+    // Regras de validação
+  const validationRules = {
+    nome: {
+      required: 'Nome é obrigatório',
+      minLength: {
+        value: 2,
+        message: 'Nome deve ter pelo menos 2 caracteres'
+      },
+      maxLength: {
+        value: 100,
+        message: 'Nome deve ter no máximo 100 caracteres'
+      },
+      pattern: {
+        value: /^[A-Za-zÀ-ÿ\s']+$/,
+        message: 'Nome deve conter apenas letras e espaços'
+      }
+    },
+    email: {
+      required: 'Email é obrigatório',
+      pattern: {
+        value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        message: 'Por favor, insira um email válido'
+      },
+      maxLength: {
+        value: 100,
+        message: 'Email deve ter no máximo 100 caracteres'
+      }
+    },
+    telefone: {
+      pattern: {
+        value: /^[\d\s\-()]+$/,
+        message: 'Telefone deve conter apenas números, espaços, hífens e parênteses'
+      },
+      // CORREÇÃO: Limitado a 11 dígitos (formato: (11) 99999-9999 = 15 caracteres)
+      maxLength: {
+        value: 15,
+        message: 'Telefone deve ter no máximo 11 dígitos'
+      },
+      validate: (value: string) => {
+        if (!value) return true; // Opcional
+        
+        const digitsOnly = value.replace(/\D/g, '');
+        
+        // Verifica se tem exatamente 11 dígitos
+        if (digitsOnly.length !== 11) {
+          return 'Telefone deve ter exatamente 11 dígitos';
+        }
+        
+        // Verifica se o DDD é válido (começa com dígitos 1-9)
+        const ddd = digitsOnly.substring(0, 2);
+        if (!/^[1-9][0-9]$/.test(ddd)) {
+          return 'DDD inválido';
+        }
+        
+        return true;
+      }
+    },
+    assunto: {
+      required: 'Assunto é obrigatório',
+      validate: (value: string) => 
+        value !== '' || 'Por favor, selecione um assunto'
+    },
+    mensagem: {
+      required: 'Mensagem é obrigatória',
+      minLength: {
+        value: 10,
+        message: 'Mensagem deve ter pelo menos 10 caracteres'
+      },
+      maxLength: {
+        value: 1000,
+        message: 'Mensagem deve ter no máximo 1000 caracteres'
+      },
+      validate: (value: string) => {
+        const trimmedValue = value.trim();
+        return trimmedValue.length >= 10 || 'Mensagem deve ter pelo menos 10 caracteres (sem espaços em branco)';
+      }
+    }
+  };
+
   const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactFormData>();
 
   const onSubmit = (data: ContactFormData) => {
