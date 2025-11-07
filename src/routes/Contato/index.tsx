@@ -283,9 +283,12 @@ export default function Contato() {
   };
 
   return(
-    <div>
-        <div className="voltar">
-        <button className="botao-voltar contato-voltar" onClick={handleBackClick}>
+    <div className="container mx-auto p-4 max-w-2xl">
+      <div className="voltar mb-6">
+        <button 
+          className="botao-voltar contato-voltar flex items-center gap-2 text-white-600 hover:text-blue-800 transition-colors"
+          onClick={handleBackClick}
+        >
           <svg
             className="icone-voltar"
             fill="none"
@@ -304,6 +307,31 @@ export default function Contato() {
           Voltar
         </button>
       </div>
+
+            <div className="bg-white rounded-lg shadow-lg p-6">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Entre em Contato</h1>
+
+        <form className="form-contato space-y-6" onSubmit={handleSubmit(onSubmit)}>
+          
+          {/* Campo Nome */}
+          <div className="form-grupo">
+            <label htmlFor="nome" className="block text-sm font-medium text-gray-700 mb-2">
+              Nome Completo*
+            </label>
+            <input
+              id="nome"
+              type="text"
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors ${
+                errors.nome ? 'border-red-500 bg-red-50' : 'border-gray-300'
+              }`}
+              placeholder="Digite seu nome completo"
+              {...register("nome", validationRules.nome)}
+              onBlur={() => trigger('nome')}
+            />
+            {errors.nome && (
+              <span className="text-red-500 text-sm mt-1 block">{errors.nome.message}</span>
+            )}
+          </div>
 
       <form className="form-contato" onSubmit={handleSubmit(onSubmit)}>
         
