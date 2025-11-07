@@ -218,17 +218,70 @@ export default function Contato() {
     }
   };
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<ContactFormData>();
+// Função para formatar telefone em tempo real e limitar a 11 dígitos
+  const formatPhone = (value: string) => {
+    // Remove tudo que não é dígito
+    const numbers = value.replace(/\D/g, '');
+    
+    // CORREÇÃO: Limita a 11 dígitos
+    const limitedNumbers = numbers.slice(0, 11);
+    
+    // Aplica a formatação apenas se tiver dígitos
+    if (limitedNumbers.length === 0) return '';
+    
+    if (limitedNumbers.length <= 2) {
+      return `(${limitedNumbers}`;
+    } else if (limitedNumbers.length <= 6) {
+      return `(${limitedNumbers.slice(0, 2)}) ${limitedNumbers.slice(2)}`;
+    } else if (limitedNumbers.length <= 10) {
+      return `(${limitedNumbers.slice(0, 2)}) ${limitedNumbers.slice(2, 6)}-${limitedNumbers.slice(6)}`;
+    } else {
+      return `(${limitedNumbers.slice(0, 2)}) ${limitedNumbers.slice(2, 7)}-${limitedNumbers.slice(7, 11)}`;
+    }
+  };
 
-  const onSubmit = (data: ContactFormData) => {
-    console.log("Dados do formulário:", data);
-    alert("Mensagem enviada com sucesso! Entraremos em contato em breve.");
-    reset();
+  // Função para lidar com a mudança do telefone
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const formatted = formatPhone(e.target.value);
+    e.target.value = formatted;
+    
+    // Dispara a validação após a formatação
+    setTimeout(() => trigger('telefone'), 100);
+  };
+
+  const showMessage = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+    setModalMessage({ title, message, type });
+    setShowModal(true);
+  };
+
+  const onSubmit = async (data: ContactFormData) => {
+    try {
+      // Simula o envio do formulário (substitua por sua API)
+      console.log("Dados do formulário validados:", data);
+      
+      // Simula um delay de rede
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      showMessage(
+        "Mensagem Enviada!", 
+        "Sua mensagem foi enviada com sucesso! Entraremos em contato em breve.", 
+        'success'
+      );
+      
+      reset();
+    } catch {
+      showMessage(
+        "Erro no Envio", 
+        "Houve um erro ao enviar sua mensagem. Por favor, tente novamente.", 
+        'error'
+      );
+    }
   };
 
   const handleBackClick = () => {
     navigate(-1);
   };
+
   return(
     <div>
         <div className="voltar">
