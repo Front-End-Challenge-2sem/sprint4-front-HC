@@ -205,7 +205,6 @@ export default function Cadastro() {
 
   return (
     <div className="cadastro-container">
-
       
       <div className="voltar">
         <button onClick={handleBackClick} className="botao-voltar">
@@ -285,12 +284,13 @@ export default function Cadastro() {
             </div>
 
             <div className="campo-form">
-              <label htmlFor="telefone">Telefone</label>
+              <label htmlFor="telefone">Telefone *</label>
               <input
                 id="telefone"
                 type="tel"
                 placeholder="(00) 00000-0000"
                 {...register('telefone', {
+                  required: 'Telefone é obrigatório',
                   pattern: { value: /^\(\d{2}\) \d{4,5}-\d{4}$/, message: 'Telefone deve estar no formato (00) 00000-0000' }
                 })}
                 onChange={handlePhoneChange}
@@ -319,18 +319,36 @@ export default function Cadastro() {
             </div>
 
             <div className="campo-form">
-              <label>
+              <label className="flex items-start gap-2">
                 <input
                   type="checkbox"
+                  className="mt-1"
                   {...register('termos', { required: 'Você deve aceitar os termos de uso' })}
-                />{' '}
-                Eu concordo com os <a href="#">Termos de Uso</a> e <a href="#">Política de Privacidade</a>
+                />
+                <span>
+                  Eu concordo com os <a href="#" className="text-blue-600 hover:text-blue-800">Termos de Uso</a> e <a href="#" className="text-blue-600 hover:text-blue-800">Política de Privacidade</a>
+                </span>
               </label>
               {errors.termos && <p className="mensagem-erro">{errors.termos.message}</p>}
             </div>
 
-            <button type="submit" disabled={!termosAceitos} className="botao">
-              Cadastrar
+            <button 
+              type="submit" 
+              disabled={!termosAceitos || isSubmitting}
+              className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
+                !termosAceitos || isSubmitting
+                  ? 'bg-gray-400 cursor-not-allowed text-gray-200'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+              }`}
+            >
+              {isSubmitting ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Processando...
+                </div>
+              ) : (
+                'Cadastrar'
+              )}
             </button>
           </form>
 
@@ -351,6 +369,15 @@ export default function Cadastro() {
 
         </div>
       </div>
+
+      {/* Modal de Mensagem */}
+      <MessageModal
+        isOpen={showModal}
+        title={modalMessage.title}
+        message={modalMessage.message}
+        type={modalMessage.type}
+        onClose={() => setShowModal(false)}
+      />
     </div>
   );
 }
