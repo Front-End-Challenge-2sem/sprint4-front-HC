@@ -81,6 +81,29 @@ const MessageModal: React.FC<MessageModalProps> = ({
     }
   };
 
+    return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div className={`bg-white rounded-lg shadow-xl w-full max-w-md border-2 ${getBackgroundColor()}`}>
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="text-2xl">{getIcon()}</span>
+            <h2 className={`text-xl font-bold ${getTextColor()}`}>{title}</h2>
+          </div>
+          <p className={`${getTextColor()} mb-6`}>{message}</p>
+          <div className="flex justify-end">
+            <button
+              onClick={onClose}
+              className={`${getButtonColor()} text-white py-2 px-6 rounded-lg font-semibold transition-colors`}
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Cadastro() {
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors }, watch, setError } = useForm<TipoCadastro>();
