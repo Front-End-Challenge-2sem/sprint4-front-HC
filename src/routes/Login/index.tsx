@@ -104,6 +104,52 @@ const MessageModal: React.FC<MessageModalProps> = ({
   );
 };
 
+export default function Login() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { register, handleSubmit, formState: { errors }, setError, setValue } = useForm<TipoLogin>();
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [cadastroData, setCadastroData] = useState<{cpf?: string, telefone?: string}>({});
+  
+  // Estados para os modals
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState({ 
+    title: '', 
+    message: '', 
+    type: 'info' as 'success' | 'error' | 'warning' | 'info' 
+  });
+
+  // Verificar se veio do cadastro com sucesso
+  useEffect(() => {
+    if (location.state?.cadastroSucesso) {
+      setShowSuccessMessage(true);
+      setCadastroData({
+        cpf: location.state.cpf,
+        telefone: location.state.telefone
+      });
+      
+      // Preencher automaticamente os campos
+      if (location.state.cpf) {
+        setValue('cpf', location.state.cpf);
+      }
+      if (location.state.telefone) {
+        setValue('telefone', location.state.telefone);
+      }
+
+      // Limpar mensagem após 5 segundos
+      const timer = setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [location.state, setValue]);
+
+  const showMessage = (title: string, message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+    setModalMessage({ title, message, type });
+    setShowModal(true);
+  };
+
 
   return(
   <div className="pagina-login">
