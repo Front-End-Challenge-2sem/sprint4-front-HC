@@ -150,6 +150,65 @@ export default function Login() {
     setShowModal(true);
   };
 
+  const onSubmit = (data: TipoLogin) => {
+    console.log('Dados de login:', data);
+
+    // Verificar se os dados correspondem aos do cadastro
+    const savedUserData = localStorage.getItem('userData');
+    
+    if (savedUserData) {
+      const userData = JSON.parse(savedUserData);
+      
+      if (data.cpf === userData.cpf && data.telefone === userData.telefone) {
+        // Marcar usuário como logado
+        localStorage.setItem('isLoggedIn', 'true');
+        
+        // Mostrar modal de sucesso
+        showMessage(
+          "Login Realizado!", 
+          "Login realizado com sucesso! Redirecionando para a página inicial...", 
+          'success'
+        );
+        
+        // Recarregar a página para atualizar o cabeçalho após fechar o modal
+        setTimeout(() => {
+          window.location.href = '/';
+        }, 2000);
+        return;
+      }
+    }
+
+    // Fallback para dados de teste
+    if (data.cpf === '123.456.789-00' && data.telefone === '(11) 99999-9999') {
+      // Criar dados mock para usuário de teste
+      const mockUserData = {
+        nome: 'Usuário Teste',
+        cpf: data.cpf,
+        telefone: data.telefone,
+        email: 'teste@exemplo.com'
+      };
+      localStorage.setItem('userData', JSON.stringify(mockUserData));
+      localStorage.setItem('isLoggedIn', 'true');
+      
+      // Mostrar modal de sucesso
+      showMessage(
+        "Login Realizado!", 
+        "Login realizado com sucesso! Redirecionando para a página inicial...", 
+        'success'
+      );
+      
+      // Recarregar a página para atualizar o cabeçalho após fechar o modal
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 2000);
+    } else {
+      setError('root', {
+        type: 'manual',
+        message: 'CPF ou telefone incorretos. Tente novamente.'
+      });
+    }
+  };
+
 
   return(
   <div className="pagina-login">
