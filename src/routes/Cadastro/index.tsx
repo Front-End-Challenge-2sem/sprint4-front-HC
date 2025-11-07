@@ -36,6 +36,51 @@ const MessageModal: React.FC<MessageModalProps> = ({
     }
   };
 
+    const getBackgroundColor = () => {
+    switch (type) {
+      case 'success':
+        return 'bg-green-50 border-green-200';
+      case 'error':
+        return 'bg-red-50 border-red-200';
+      case 'warning':
+        return 'bg-yellow-50 border-yellow-200';
+      case 'info':
+        return 'bg-blue-50 border-blue-200';
+      default:
+        return 'bg-blue-50 border-blue-200';
+    }
+  };
+
+  const getTextColor = () => {
+    switch (type) {
+      case 'success':
+        return 'text-green-800';
+      case 'error':
+        return 'text-red-800';
+      case 'warning':
+        return 'text-yellow-800';
+      case 'info':
+        return 'text-blue-800';
+      default:
+        return 'text-blue-800';
+    }
+  };
+
+  const getButtonColor = () => {
+    switch (type) {
+      case 'success':
+        return 'bg-green-500 hover:bg-green-600';
+      case 'error':
+        return 'bg-red-500 hover:bg-red-600';
+      case 'warning':
+        return 'bg-yellow-500 hover:bg-yellow-600';
+      case 'info':
+        return 'bg-blue-500 hover:bg-blue-600';
+      default:
+        return 'bg-blue-500 hover:bg-blue-600';
+    }
+  };
+
 export default function Cadastro() {
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors }, watch, setError } = useForm<TipoCadastro>();
