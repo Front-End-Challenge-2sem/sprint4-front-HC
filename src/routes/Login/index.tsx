@@ -238,18 +238,17 @@ export default function Login() {
     e.target.value = formatPhone(e.target.value);
   };
 
-
   return(
   <div className="pagina-login">
-        
-        <div className="voltar">
-          <button onClick={handleBackClick} className="botao-voltar">
-            <svg className="icone-voltar" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Voltar
-          </button>
-        </div>
+      
+      <div className="voltar">
+        <button onClick={handleBackClick} className="botao-voltar">
+          <svg className="icone-voltar" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+          Voltar
+        </button>
+      </div>
 
       <div className="login-container">
         <div className="logo-login">
@@ -266,6 +265,23 @@ export default function Login() {
 
       <div className="login-form-container">
         <div className="login-card">
+          {/* Mensagem de sucesso após cadastro */}
+          {showSuccessMessage && (
+            <div className="mensagem-sucesso">
+              <div className="icone-sucesso">✓</div>
+              <div>
+                <strong>Cadastro realizado com sucesso!</strong>
+                <p>Use o CPF e Telefone cadastrados para fazer login.</p>
+                {cadastroData.cpf && (
+                  <p className="dados-cadastro">
+                    <strong>CPF:</strong> {cadastroData.cpf} | 
+                    <strong> Telefone:</strong> {cadastroData.telefone}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
           {errors.root && (
             <div className="mensagem-erro">{errors.root.message}</div>
           )}
@@ -347,6 +363,14 @@ export default function Login() {
         </ul>
       </div>
 
-        </div>
+      {/* Modal de Mensagem */}
+      <MessageModal
+        isOpen={showModal}
+        title={modalMessage.title}
+        message={modalMessage.message}
+        type={modalMessage.type}
+        onClose={() => setShowModal(false)}
+      />
+    </div>
   );
 }
