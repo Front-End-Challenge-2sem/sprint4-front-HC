@@ -1,6 +1,40 @@
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import type { TipoLogin } from "../../types/tipoLogin";
+
+// Componente Modal de Mensagem
+interface MessageModalProps {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  onClose: () => void;
+}
+
+const MessageModal: React.FC<MessageModalProps> = ({ 
+  isOpen, 
+  title, 
+  message, 
+  type, 
+  onClose 
+}) => {
+  if (!isOpen) return null;
+
+  const getIcon = () => {
+    switch (type) {
+      case 'success':
+        return '✅';
+      case 'error':
+        return '❌';
+      case 'warning':
+        return '⚠️';
+      case 'info':
+        return 'ℹ️';
+      default:
+        return 'ℹ️';
+    }
+  };
 
 export default function Login() {
   const navigate = useNavigate();
