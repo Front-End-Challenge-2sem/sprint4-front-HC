@@ -3,7 +3,7 @@
 ## 🌐 Links Importantes
 
 - 📊 **GitHub do Projeto:** https://github.com/Front-End-Challenge-2sem/sprint4-front-HC
-- 🎥 **Vídeo Demonstrativo no YouTube:** (em andamento)
+- 🎥 **Vídeo Demonstrativo no YouTube:** https://youtu.be/2YZ0_xI5uFc
 
 ---
 
